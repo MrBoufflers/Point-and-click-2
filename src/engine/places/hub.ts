@@ -1,5 +1,7 @@
 import { AMBIENT } from '../../render/ambient';
 import { animate, el } from '../../render/svg';
+import { drawItem } from '../../render/items';
+import '../../render/journey';
 import { drawHouse, HOUSE_H, HOUSE_W } from '../../render/village';
 import type { HouseDef, VillageDef } from '../../types';
 import { ABORT, PlaceBase, type VillageCommon } from './base';
@@ -10,6 +12,9 @@ export interface HubOptions extends VillageCommon {
   done: string[];
   firstVisit: boolean;
   onEnter: (house: HouseDef) => void;
+  /** Les 5 maisons sont finies : Pilou appelle au voyage (chapitre 3). */
+  journeyReady?: boolean;
+  onJourneyCall?: () => void;
 }
 
 /** La carte du village : on touche une maison pour y entrer, dans l'ordre qu'on veut. */
@@ -86,6 +91,10 @@ export class VillageHub extends PlaceBase {
     const first = this.o.firstVisit ? this.say(v.lines.intro) : Promise.resolve();
     void this.lumi.home();
     await this.step(first);
+    if (allDone && this.o.journeyReady && v.lines.journey_call) {
+      await this.callJourney();
+      return;
+    }
     const prompt = allDone ? v.lines.all_done : v.lines.prompt;
     void this.say(prompt, { prompt: true });
     // Aide douce : Lumi montre une maison pas encore visitée. Pas d'action forcée : la carte est libre.
@@ -95,5 +104,30 @@ export class VillageHub extends PlaceBase {
       done: new Promise<void>(() => {}),
       hintTarget: () => ({ x: next.x, y: next.y - HOUSE_H / 2, top: next.y - HOUSE_H, mark: () => {} }),
     }, prompt, v.hint_delays_s);
+  }
+
+  /** La grande cloche sonne, Pilou le petit dragon arrive sur la place et demande de l'aide. */
+  private async callJourney(): Promise<void> {
+    const v = this.o.village;
+    const f = v.fountain;
+    this.o.sfx.party();
+    // Pilou arrive en volant (l'animation porte sur un groupe à part pour ne pas perdre sa position)
+    const px = f.x - 260;
+    const py = f.y + 60;
+    const fly = el('g', {}, this.stage.layers.fx);
+    const pilou = drawItem(fly, { kind: 'dragon', x: px, y: py, scale: 0.6 });
+    void animate(fly, [{ transform: 'translate(1100px, -700px)' }, { transform: 'translate(0, 0)' }], { duration: 1600, easing: 'ease-out' });
+    pilou.body.classList.add('floating');
+    this.input.add({
+      id: 'pilou', cx: px, cy: py - 70, w: 170, h: 160, enabled: true,
+      onDown: () => {
+        this.o.sfx.tap();
+        void animate(pilou.body, [{ transform: 'scale(1)' }, { transform: 'scale(1.15) rotate(-6deg)' }, { transform: 'scale(1)' }], { duration: 500 });
+        this.o.voice.clear();
+        if (v.lines.pilou_tap) void this.say(v.lines.pilou_tap);
+      },
+    });
+    await this.step(this.say(v.lines.journey_call!, { prompt: true }));
+    this.o.onJourneyCall?.();
   }
 }

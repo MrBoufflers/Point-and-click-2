@@ -36,6 +36,24 @@ l'endroit où il insère les étapes tirées.
 Chaque lieu est un fichier `data/place_*.json` décrit étape par étape (`say`, `pick`, `collect`, `tap_count`, `choose_color`,
 `fork`, `two_touch`, `parts`, `show` / `hide`, `move`, `view`, `reward`) ; la carte est dans `data/village.json`.
 
+## Chapitre 3 : le grand voyage
+
+Quand les 5 maisons sont terminées, la cloche du village sonne et Pilou, un petit dragon-nuage perdu, arrive sur la place.
+La grosse flèche part en voyage pour le ramener chez lui. Les étapes se font dans l'ordre (la progression est gardée),
+et chacune utilise une récompense du village :
+
+| Étape | Récompense | Jeu (nouveau) |
+| --- | --- | --- |
+| 1. La forêt des paires | les licornes | mémoire : retrouver 3 ou 4 paires, chacun son tour |
+| 2. Le pont qui parle | le grimoire | ombres : quel objet fait cette ombre ? |
+| 3. Le troll gourmand | le gâteau | partager : autant de parts pour chacun (2 puis 3 assiettes) |
+| 4. La rivière qui chante | la potion | suite de sons et de couleurs à répéter (2, puis 3 notes) |
+| 5. L'escalier de nuages | les fers à cheval | gauche / droite / en haut (« la gauche, c'est du côté d'Elea ») |
+| 6. Le château arc-en-ciel | | la fête : la famille de Pilou et tout le village, câlin à deux |
+
+Ici aussi, le contenu change à chaque voyage (cartes, ombres, nombre de parts, suites de notes, chemin de nuages).
+Fichiers : `data/journey.json` (ordre des étapes) et `data/journey_*.json`.
+
 Entre deux tableaux, une grosse flèche permet de continuer. La progression est gardée sur l'appareil :
 « ▶ » reprend au dernier tableau commencé, et après la Porte la partie suivante repart du début.
 
@@ -108,7 +126,7 @@ src/
     gemTouch.ts        la gemme à toucher à deux
     twoTouch.ts        détection « touchez tous les deux » (gemme et Porte)
     finale.ts          la Porte des 5 gemmes
-    places/            le village : carte (hub.ts), lieux décrits par étapes (placeRunner.ts)
+    places/            le village et le voyage : carte (hub.ts), lieux décrits par étapes (placeRunner.ts), tirages (generators.ts)
     hints.ts           minuteries d'aide progressive
     voice.ts           file de phrases (speechSynthesis), jamais deux voix en même temps
     sfx.ts             sons synthétisés Web Audio

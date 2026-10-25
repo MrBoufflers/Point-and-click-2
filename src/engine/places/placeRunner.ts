@@ -5,6 +5,7 @@ import { confetti } from '../../render/confetti';
 import { drawItem, type ItemShape } from '../../render/items';
 import { animate, colorOf, el, lerp, place, tween } from '../../render/svg';
 import { drawBubble, drawCard } from '../../render/village';
+import '../../render/journey';
 import { AMBIENT } from '../../render/ambient';
 import type { ItemDef, PlaceDef, PlayerId, StepDef } from '../../types';
 import { TwoTouch } from '../twoTouch';
@@ -175,6 +176,21 @@ export class PlaceRunner extends PlaceBase {
         return;
       case 'reward':
         await this.reward(s.from);
+        return;
+      case 'use':
+        await this.useReward(s, ctx);
+        return;
+      case 'memory':
+        await this.memory(s);
+        return;
+      case 'share':
+        await this.share(s, ctx);
+        return;
+      case 'simon':
+        await this.simon(s);
+        return;
+      case 'direction':
+        await this.direction(s);
         return;
     }
     void P;
@@ -510,6 +526,319 @@ export class PlaceRunner extends PlaceBase {
     }
     confetti(this.stage.layers.fx, { x: a.x, y: a.y }, 70);
     if (s.success_line) await this.step(this.say(this.text(s.success_line, 'both')));
+  }
+
+  private showItems(ids: string[] | undefined, show: boolean): void {
+    for (const id of ids ?? []) {
+      const live = this.items.get(id);
+      if (!live) continue;
+      live.shape.root.style.display = show ? '' : 'none';
+      this.input.setEnabled(`it_${id}`, show && !live.used);
+      if (show) void animate(live.shape.body, [{ transform: 'scale(0)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'ease-out' });
+    }
+  }
+
+  /** Une récompense sort du sac et sert dans la scène. */
+  private async useReward(s: Extract<StepDef, { type: 'use' }>, ctx?: PlayerId): Promise<void> {
+    this.portraits.setActive('both');
+    const from = this.bag.slotPosition(s.reward);
+    const g = el('g', {}, this.stage.layers.fx);
+    const icon = el('g', { class: 'glow' }, g);
+    drawRewardIcon(icon, s.reward, this.o.look);
+    this.o.sfx.success();
+    const line = s.line ? this.say(this.text(s.line, this.resolvePlayer(undefined, ctx))) : Promise.resolve();
+    await this.step(tween(1200, (k) => place(g, lerp(from.x, s.to.x, k), lerp(from.y, s.to.y, k) - Math.sin(k * Math.PI) * 140, lerp(1, s.scale ?? 2.4, k))));
+    this.splash(s.to.x, s.to.y + 40);
+    await this.step(animate(g, [{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: 'forwards' }));
+    g.remove();
+    this.showItems(s.then_show, true);
+    this.showItems(s.then_hide, false);
+    await this.step(line);
+  }
+
+  /** Jeu de mémoire : chacun son tour retourne deux cartes. Pas de perdant : on retourne les cartes et on recommence. */
+  private async memory(s: Extract<StepDef, { type: 'memory' }>): Promise<void> {
+    const order = this.order();
+    let turn = 0;
+    const who = () => order[turn % 2];
+    const n = s.faces.length * 2;
+    const deck = s.faces.flatMap((_, i) => [i, i]).sort(() => Math.random() - 0.5);
+    const rows = Math.ceil(n / s.grid.cols);
+    type Card = { face: number; root: SVGGElement; back: SVGGElement; front: SVGGElement; x: number; y: number; open: boolean; done: boolean; hit: string };
+    const cards: Card[] = deck.map((face, i) => {
+      const col = i % s.grid.cols;
+      const row = Math.floor(i / s.grid.cols);
+      const x = s.grid.x + (col - (s.grid.cols - 1) / 2) * s.grid.cell;
+      const y = s.grid.y + (row - (rows - 1) / 2) * s.grid.cell + 90;
+      const root = el('g', {}, this.stage.layers.signs);
+      place(root, x, y);
+      const flip = el('g', { class: 'anim-center' }, root);
+      const back = el('g', {}, flip);
+      drawItem(back, { kind: 'card_back', x: 0, y: 0 });
+      const front = el('g', {}, flip);
+      el('rect', { x: -85, y: -180, width: 170, height: 170, rx: 22, fill: '#fffde7', stroke: '#8d6e63', 'stroke-width': 6 }, front);
+      const f = s.faces[face];
+      drawItem(front, { ...f, x: 0, y: -40, scale: f.scale ?? 0.85 }, 'shape');
+      front.style.display = 'none';
+      void animate(flip, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 400, delay: i * 60, easing: 'ease-out', fill: 'backwards' });
+      return { face, root, back, front, x, y: y - 95, open: false, done: false, hit: `card_${i}` };
+    });
+    const turnText = () => this.text(s.turn, who());
+    const flipTo = async (c: Card, open: boolean) => {
+      const flip = c.root.firstElementChild as SVGGElement;
+      await animate(flip, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: 160, fill: 'forwards' });
+      c.open = open;
+      c.front.style.display = open ? '' : 'none';
+      c.back.style.display = open ? 'none' : '';
+      await animate(flip, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 160, fill: 'forwards' });
+    };
+    let opened: Card[] = [];
+    let busy = false;
+    let finish: (() => void) | null = null;
+    this.portraits.setActive(who());
+    void this.say(turnText(), { prompt: true });
+    const tapCard = async (c: Card) => {
+      if (busy || c.open || c.done) return;
+      this.o.sfx.tap();
+      opened.push(c);
+      if (opened.length === 2) busy = true;
+      await flipTo(c, true);
+      if (opened.length < 2) return;
+      const [a, b] = opened;
+      opened = [];
+      if (a.face === b.face) {
+        a.done = b.done = true;
+        this.input.remove(a.hit);
+        this.input.remove(b.hit);
+        this.progress();
+        this.o.sfx.success();
+        for (const x of [a, b]) {
+          x.front.classList.add('glow');
+          void hop(x.root.firstElementChild as SVGGElement);
+        }
+        await this.say(s.match_lines[Math.floor(Math.random() * s.match_lines.length)]);
+        if (cards.every((x) => x.done)) {
+          busy = false;
+          finish?.();
+          return;
+        }
+      } else {
+        await this.clock.wait(1100);
+        await Promise.all([flipTo(a, false), flipTo(b, false)]);
+        void this.say(s.miss_line);
+      }
+      turn++;
+      this.portraits.setActive(who());
+      void this.say(turnText(), { prompt: true });
+      busy = false;
+    };
+    cards.forEach((c) => this.input.add({ id: c.hit, cx: c.x, cy: c.y, w: s.grid.cell * 0.85, h: s.grid.cell * 0.85, enabled: true, onDown: () => void tapCard(c) }));
+    // Aide : Lumi montre une carte, puis sa jumelle.
+    const helpTarget = (): Card | null => {
+      if (opened.length === 1) return cards.find((x) => !x.done && x !== opened[0] && x.face === opened[0].face) ?? null;
+      return cards.find((x) => !x.done) ?? null;
+    };
+    await this.withHints({
+      done: new Promise<void>((r) => (finish = r)),
+      hintTarget: () => {
+        const c = helpTarget();
+        return c ? { x: c.x, y: c.y, top: c.y - 85, mark: (on) => (c.root.firstElementChild as SVGGElement).classList.toggle('hint-sparkle', on) } : null;
+      },
+      autoSolve: () => {
+        if (busy) return;
+        const c = helpTarget();
+        if (!c) return;
+        void tapCard(c).then(() => {
+          const twin = opened.length === 1 ? cards.find((x) => !x.done && x !== opened[0] && x.face === opened[0].face) : null;
+          if (twin) window.setTimeout(() => void tapCard(twin), 400);
+        });
+      },
+    }, turnText, this.o.place.hint_delays_s, this.o.place.auto_solve_after_s);
+    if (s.done_line) await this.step(this.say(s.done_line));
+    await Promise.all(cards.map((c) => animate(c.root, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' })));
+    cards.forEach((c) => c.root.remove());
+  }
+
+  /** Partager : on touche une assiette pour lui donner une part ; une assiette pleine dit « assez ! ». */
+  private async share(s: Extract<StepDef, { type: 'share' }>, ctx?: PlayerId): Promise<void> {
+    const who = this.resolvePlayer(s.player, ctx);
+    this.portraits.setActive(who);
+    const total = s.plates.length * s.per_plate;
+    const pieces = Array.from({ length: total }, (_, i) => {
+      const x = s.pile.x + (i - (total - 1) / 2) * Math.min(80, 520 / total);
+      const shape = drawItem(this.stage.layers.signs, { kind: 'slice', color: '#f8bbd0', x, y: s.pile.y, scale: 0.9 });
+      void animate(shape.body, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: i * 60, fill: 'backwards' });
+      return { shape, x, y: s.pile.y, given: false };
+    });
+    const counts = s.plates.map(() => 0);
+    const plateShapes = s.plates.map((p) => drawItem(this.stage.layers.objects, { kind: 'plate', x: p.x, y: p.y }));
+    const prompt = this.text(s.prompt, who);
+    void this.say(prompt, { prompt: true });
+    let given = 0;
+    let lastFull = 0;
+    let finish: (() => void) | null = null;
+    const give = (pi: number) => {
+      if (given >= total) return;
+      const p = s.plates[pi];
+      if (counts[pi] >= s.per_plate) {
+        void wobble(plateShapes[pi].body);
+        this.o.sfx.pouic();
+        if (performance.now() - lastFull > 3000) {
+          lastFull = performance.now();
+          void this.say(s.full_line);
+        }
+        return;
+      }
+      const piece = pieces.find((x) => !x.given)!;
+      piece.given = true;
+      const k = counts[pi]++;
+      given++;
+      this.progress();
+      this.o.sfx.success();
+      void this.say(s.count_words?.[k] ?? String(k + 1));
+      const to = { x: p.x + (k - (s.per_plate - 1) / 2) * 46, y: p.y - 20 - (k % 2) * 6 };
+      void flyItem(piece.shape, { x: piece.x, y: piece.y }, 0.9, to, 0.7, 600).then(() => {
+        if (given >= total) window.setTimeout(() => finish?.(), 400);
+      });
+    };
+    s.plates.forEach((p, i) => this.input.add({ id: `plate_${i}`, cx: p.x, cy: p.y - 40, w: 220, h: 160, enabled: true, onDown: () => give(i) }));
+    const emptiest = () => counts.indexOf(Math.min(...counts));
+    await this.withHints({
+      done: new Promise<void>((r) => (finish = r)),
+      hintTarget: () => {
+        if (given >= total) return null;
+        const i = emptiest();
+        const p = s.plates[i];
+        return { x: p.x, y: p.y - 20, top: p.y - 60, mark: (on) => plateShapes[i].body.classList.toggle('hint-sparkle', on) };
+      },
+      autoSolve: () => give(emptiest()),
+    }, prompt, this.o.place.hint_delays_s, this.o.place.auto_solve_after_s);
+    s.plates.forEach((_, i) => this.input.remove(`plate_${i}`));
+    if (s.success_line) await this.step(this.say(this.text(s.success_line, who)));
+    await Promise.all([...pieces.map((x) => x.shape.root), ...plateShapes.map((x) => x.root)].map((r) => animate(r, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' })));
+    pieces.forEach((x) => x.shape.root.remove());
+    plateShapes.forEach((x) => x.root.remove());
+  }
+
+  /** Suite de sons et couleurs : Lumi joue, l'enfant répète. Une erreur ? On réécoute, c'est tout. */
+  private async simon(s: Extract<StepDef, { type: 'simon' }>): Promise<void> {
+    const pads = s.pads.map((p, i) => {
+      const shape = drawItem(this.stage.layers.objects, { kind: 'pad', color: p.color, x: p.x, y: p.y });
+      void animate(shape.body, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 400, delay: i * 120, fill: 'backwards' });
+      return { ...p, shape, hit: `pad_${i}` };
+    });
+    const light = (i: number) => {
+      const p = pads[i];
+      this.o.sfx.chime(i);
+      p.shape.body.classList.add('glow');
+      void animate(p.shape.body, [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-18px) scale(1.15)' }, { transform: 'translateY(0) scale(1)' }], { duration: 450 });
+      window.setTimeout(() => p.shape.body.classList.remove('glow'), 450);
+    };
+    for (const round of s.rounds) {
+      const who = this.resolvePlayer(round.player);
+      this.portraits.setActive(who);
+      let pos = 0;
+      let listening = true;
+      const play = async () => {
+        listening = true;
+        await this.step(this.say(s.listen));
+        for (const i of round.seq) {
+          light(i);
+          await this.step(this.clock.wait(700));
+        }
+        listening = false;
+        pos = 0;
+      };
+      await play();
+      const yourTurn = this.text(s.your_turn, who);
+      void this.say(yourTurn, { prompt: true });
+      let finish: (() => void) | null = null;
+      const tap = (i: number) => {
+        if (listening || pos >= round.seq.length) return;
+        light(i);
+        if (i === round.seq[pos]) {
+          pos++;
+          this.progress();
+          if (pos >= round.seq.length) {
+            this.o.sfx.success();
+            window.setTimeout(() => finish?.(), 500);
+          }
+        } else {
+          // Pas de son d'erreur : on réécoute la suite ensemble.
+          listening = true;
+          window.setTimeout(() => {
+            void this.say(s.retry_line).then(() => play()).then(() => void this.say(yourTurn, { prompt: true })).catch(() => {});
+          }, 400);
+        }
+      };
+      pads.forEach((p, i) => this.input.add({ id: p.hit, cx: p.x, cy: p.y - 50, w: 210, h: 130, enabled: true, onDown: () => tap(i) }));
+      await this.withHints({
+        done: new Promise<void>((r) => (finish = r)),
+        hintTarget: () => {
+          if (pos >= round.seq.length) return null;
+          const p = pads[round.seq[pos]];
+          return { x: p.x, y: p.y - 50, top: p.y - 110, mark: (on) => p.shape.body.classList.toggle('hint-sparkle', on) };
+        },
+        autoSolve: () => tap(round.seq[pos]),
+      }, yourTurn, this.o.place.hint_delays_s, this.o.place.auto_solve_after_s);
+      pads.forEach((p) => this.input.remove(p.hit));
+      await this.step(this.say(s.good_lines[Math.floor(Math.random() * s.good_lines.length)]));
+    }
+  }
+
+  /** Gauche, droite, haut, bas : sauter sur le bon nuage. Lumi montre le bon côté en cas d'erreur. */
+  private async direction(s: Extract<StepDef, { type: 'direction' }>): Promise<void> {
+    const walkers = s.walkers.map((id) => this.items.get(id)).filter((l): l is Live => !!l);
+    const offsets = walkers.map((w) => ({ dx: w.def.x - s.start.x, dy: w.def.y - s.start.y, s: w.def.scale ?? 1 }));
+    let at = { ...s.start };
+    for (const round of s.rounds) {
+      const who = this.resolvePlayer(round.player);
+      this.portraits.setActive(who);
+      const clouds = [round.to, round.other].map((p, i) => {
+        const shape = drawItem(this.stage.layers.ambient, { kind: 'cloud_step', x: p.x, y: p.y });
+        void animate(shape.body, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 400, delay: i * 150, fill: 'backwards' });
+        return { p, shape, good: i === 0, hit: `cloud_${i}` };
+      });
+      const prompt = this.text(s.prompts[round.dir], who);
+      void this.say(prompt, { prompt: true });
+      let finish: (() => void) | null = null;
+      let done = false;
+      let lastWrong = 0;
+      const tap = (c: (typeof clouds)[number]) => {
+        if (done) return;
+        if (!c.good) {
+          void wobble(c.shape.body);
+          if (performance.now() - lastWrong > 2500) {
+            lastWrong = performance.now();
+            this.o.voice.clear();
+            void this.say(s.wrong[round.dir]);
+            void this.lumi.hoverNear({ x: round.to.x, y: round.to.y - 50, top: round.to.y - 110 });
+          }
+          return;
+        }
+        done = true;
+        this.progress();
+        this.o.sfx.success();
+        const from = at;
+        at = { ...round.to };
+        void Promise.all(walkers.map((w, i) => {
+          const o = offsets[i];
+          return tween(700, (k) => place(w.shape.root, lerp(from.x, at.x, k) + o.dx, lerp(from.y, at.y, k) + o.dy - Math.sin(k * Math.PI) * 120, o.s));
+        })).then(() => {
+          walkers.forEach((w, i) => Object.assign(w.def, { x: at.x + offsets[i].dx, y: at.y + offsets[i].dy }));
+          finish?.();
+        });
+      };
+      clouds.forEach((c) => this.input.add({ id: c.hit, cx: c.p.x, cy: c.p.y - 50, w: 240, h: 130, enabled: true, onDown: () => tap(c) }));
+      await this.withHints({
+        done: new Promise<void>((r) => (finish = r)),
+        hintTarget: () => (done ? null : { x: round.to.x, y: round.to.y - 50, top: round.to.y - 110, mark: (on) => clouds[0].shape.body.classList.toggle('hint-sparkle', on) }),
+        autoSolve: () => tap(clouds[0]),
+      }, prompt, this.o.place.hint_delays_s, this.o.place.auto_solve_after_s);
+      clouds.forEach((c) => this.input.remove(c.hit));
+      void animate(clouds[1].shape.root, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' }).then(() => clouds[1].shape.root.remove());
+      await this.step(this.say(s.good_lines[Math.floor(Math.random() * s.good_lines.length)]));
+    }
   }
 
   private async reward(from: { x: number; y: number }): Promise<void> {

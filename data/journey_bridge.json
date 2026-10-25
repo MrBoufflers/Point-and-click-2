@@ -1,0 +1,64 @@
+{
+  "_meta": {"version": "0.1", "description": "Le voyage 2 : le pont qui parle"},
+  "id": "journey_bridge",
+  "reward": "",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 420, "y": 180}},
+  "view": {
+    "backdrop": "river",
+    "decor": [
+      {"type": "tree", "x": 130, "y": 545},
+      {"type": "tree", "x": 1470, "y": 545},
+      {"type": "reed", "x": 300, "y": 712}
+    ]
+  },
+  "items": [
+    {"id": "bridge", "kind": "bridge_face", "x": 800, "y": 705, "scale": 0.85},
+    {"id": "pilou", "kind": "dragon", "x": 1430, "y": 470, "scale": 0.45}
+  ],
+  "steps": [
+    {
+      "type": "say",
+      "pitch": 0.6,
+      "text": "Hum hum ! Je suis le pont qui parle. Pour passer, il faut deviner mes ombres !"
+    },
+    {
+      "type": "use",
+      "reward": "grimoire",
+      "to": {"x": 420, "y": 330},
+      "line": "Le grimoire ancien s'ouvre… Il nous aidera à comprendre le pont !"
+    },
+    {"type": "slot", "name": "shadows"},
+    {"type": "say", "pitch": 0.6, "text": "Bravo ! Vous avez deviné toutes mes ombres. Vous pouvez passer !"}
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour continuer le voyage !"},
+  "generator": "bridge",
+  "config": {
+    "objects": [
+      {"id": "mushroom", "kind": "mushroom", "color": "red", "label": "le champignon"},
+      {"id": "star", "kind": "star", "color": "#ffca28", "label": "l'étoile"},
+      {"id": "feather", "kind": "feather", "color": "#1e88e5", "label": "la plume"},
+      {"id": "leaf", "kind": "leaf", "color": "#43a047", "label": "la feuille"},
+      {"id": "flower", "kind": "flower", "color": "#ec407a", "label": "la fleur", "scale": 0.8},
+      {"id": "bottle", "kind": "bottle", "color": "#ab47bc", "label": "la potion"},
+      {"id": "horseshoe", "kind": "horseshoe", "color": "#cfd8dc", "label": "le fer à cheval"},
+      {"id": "cherry", "kind": "cherry", "label": "les cerises"},
+      {"id": "strawberry", "kind": "strawberry", "label": "la fraise", "scale": 1.2},
+      {"id": "bird", "kind": "bird", "color": "#29b6f6", "label": "l'oiseau"},
+      {"id": "candle", "kind": "candle", "color": "#f48fb1", "label": "la bougie", "scale": 1.2},
+      {"id": "heart", "kind": "shape", "shape": "heart", "color": "#e53935", "label": "le cœur"},
+      {"id": "triangle", "kind": "shape", "shape": "triangle", "color": "#fb8c00", "label": "le triangle"}
+    ],
+    "choice_xs": [480, 800, 1120],
+    "choice_y": 870,
+    "bubble": {"x": 1130, "y": 250},
+    "lines": {
+      "ask_first": "{name}, quel objet fait cette ombre ? Touche-le !",
+      "ask_second": "{name}, à toi ! Quel objet fait cette ombre ?",
+      "ask_both": "La dernière ombre ! Cherchez ensemble quel objet la fait !",
+      "retry": "Regarde bien la forme de l'ombre.",
+      "good": ["Oui ! C'était {thing} !", "Bravo ! C'est bien {thing} !"]
+    }
+  }
+}

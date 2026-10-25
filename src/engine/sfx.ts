@@ -39,6 +39,13 @@ export class Sfx {
     this.note(700, 0, 0.12, { type: 'square', gain: 0.05 });
   }
 
+  /** Note d'un nénuphar musical (0 à 5 : do, mi, sol, la, do, mi). */
+  chime(i: number): void {
+    const f = [523.25, 659.25, 783.99, 880, 1046.5, 1318.5][i % 6];
+    this.note(f, 0, 0.5, { type: 'triangle', gain: 0.22 });
+    this.note(f * 2, 0, 0.3, { gain: 0.05 });
+  }
+
   /** Mauvais champignon : « pouic » rigolo (pas un son d'erreur). */
   pouic(): void {
     this.note(1100, 0, 0.08, { type: 'triangle', to: 1700, gain: 0.12 });

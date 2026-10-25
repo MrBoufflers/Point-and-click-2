@@ -8,7 +8,7 @@ import { SceneRunner } from './engine/sceneRunner';
 import { Sfx } from './engine/sfx';
 import { Voice } from './engine/voice';
 import { loadJSON, loadPrefs, savePrefs, type Prefs } from './settings';
-import type { GameSettings, HouseDef, LevelDef, PlaceDef, SceneDef, VillageDef } from './types';
+import type { GameSettings, HouseDef, JourneyDef, LevelDef, PlaceDef, SceneDef, VillageDef } from './types';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -44,6 +44,7 @@ interface Game {
   level: LevelDef | null;
   village: VillageDef | null;
   places: Map<string, PlaceDef>;
+  journey: JourneyDef | null;
 }
 
 async function loadGame(settings: GameSettings): Promise<Game> {
@@ -61,7 +62,13 @@ async function loadGame(settings: GameSettings): Promise<Game> {
     const defs = await Promise.all(files.map((f) => loadJSON<PlaceDef>(`./data/${f}`)));
     files.forEach((f, i) => places.set(f, defs[i]));
   }
-  return { scenes, level: isFile(single) ? null : level, village, places };
+  let journey: JourneyDef | null = null;
+  if (village && settings.journey) {
+    journey = await loadJSON<JourneyDef>(`./data/${settings.journey}`);
+    const defs = await Promise.all(journey.steps.map((f) => loadJSON<PlaceDef>(`./data/${f}`)));
+    journey.steps.forEach((f, i) => places.set(f, defs[i]));
+  }
+  return { scenes, level: isFile(single) ? null : level, village, places, journey };
 }
 
 async function boot(): Promise<void> {
@@ -70,7 +77,8 @@ async function boot(): Promise<void> {
   const prefs = loadPrefs(settings);
   const doorBoard = game.scenes.length;
   const villageBoard = game.village ? doorBoard + 1 : -1;
-  const lastBoard = game.village ? villageBoard : game.level ? doorBoard : game.scenes.length - 1;
+  const journeyBoard = game.journey ? villageBoard + 1 : -1;
+  const lastBoard = game.journey ? journeyBoard : game.village ? villageBoard : game.level ? doorBoard : game.scenes.length - 1;
   if (prefs.board > lastBoard) prefs.board = 0;
 
   const voice = new Voice(settings.voice.lang);
@@ -136,6 +144,46 @@ async function boot(): Promise<void> {
     runner = new VillageHub({
       ...villageCommon(), village: game.village, done: prefs.village.done, firstVisit: first,
       onEnter: (h) => startPlace(h),
+      journeyReady: !!game.journey,
+      onJourneyCall: () => {
+        // Pilou a parlé : la grosse flèche emmène en voyage.
+        onNext = () => startJourney(prefs.journey.step);
+        next.hidden = false;
+      },
+    });
+    runner.start();
+  };
+
+  /** Chapitre 3 : les étapes du voyage, dans l'ordre. */
+  const startJourney = (step: number) => {
+    if (!game.journey) return;
+    const files = game.journey.steps;
+    const i = Math.max(0, Math.min(step, files.length - 1));
+    const raw = game.places.get(files[i]);
+    if (!raw) return;
+    resetScreen();
+    current = journeyBoard;
+    prefs.journey.step = i;
+    save(current);
+    const built = buildPlace(raw, { players: settings.players, memory: prefs.village.memory[raw.id] ?? [], again: prefs.journey.done });
+    prefs.village.memory[raw.id] = built.memory;
+    savePrefs(prefs);
+    runner = new PlaceRunner({
+      ...villageCommon(), place: built.place,
+      onState: (s) => {
+        if (s !== 'end') return;
+        ear.hidden = true;
+        if (i < files.length - 1) {
+          prefs.journey.step = i + 1;
+          onNext = () => startJourney(i + 1);
+        } else {
+          // Arrivée au château : le voyage est fini, on peut le refaire depuis le village.
+          prefs.journey = { step: 0, done: true };
+          onNext = startVillage;
+        }
+        savePrefs(prefs);
+        next.hidden = false;
+      },
     });
     runner.start();
   };
@@ -178,6 +226,7 @@ async function boot(): Promise<void> {
   const startBoard = (board: number) => {
     const b = Math.max(0, Math.min(board, lastBoard));
     if (b === villageBoard) return startVillage();
+    if (b === journeyBoard) return startJourney(prefs.journey.step);
     resetScreen();
     current = b;
     save(current);
@@ -252,6 +301,7 @@ async function boot(): Promise<void> {
   const boardNames = game.scenes.map((s, i) => `${i + 1}. ${s._meta?.description ?? s.id}`);
   if (game.level) boardNames.push(`${doorBoard + 1}. La Porte des 5 gemmes`);
   if (game.village) boardNames.push(`${villageBoard + 1}. ${game.village._meta?.description ?? 'Le village'}`);
+  if (game.journey) boardNames.push(`${journeyBoard + 1}. ${game.journey._meta?.description ?? 'Le grand voyage'}`);
   setupParentPanel({
     settings, prefs, voice,
     testLine: game.scenes[0].lines.voice_test ?? game.scenes[0].lines.gem_touch,
@@ -264,6 +314,7 @@ async function boot(): Promise<void> {
     resetAll: () => {
       $('start').hidden = true;
       prefs.village = { done: [], unicorns: {}, memory: {} };
+      prefs.journey = { step: 0, done: false };
       villageVisited = false;
       startBoard(0);
     },

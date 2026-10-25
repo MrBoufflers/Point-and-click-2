@@ -1,0 +1,54 @@
+{
+  "_meta": {"version": "0.1", "description": "Le voyage 3 : le troll gourmand"},
+  "id": "journey_troll",
+  "reward": "",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 800, "y": 200}},
+  "view": {
+    "backdrop": "forest",
+    "decor": [
+      {"type": "tree", "x": 1480, "y": 560, "scale": 1.2},
+      {"type": "rock", "x": 300, "y": 760, "scale": 1.5},
+      {"type": "bush", "x": 120, "y": 600, "scale": 0.8}
+    ]
+  },
+  "items": [
+    {"id": "troll", "kind": "troll", "x": 1050, "y": 770, "scale": 0.85},
+    {"id": "little", "kind": "troll", "color": "#aed581", "x": 1330, "y": 780, "scale": 0.5},
+    {"id": "pilou", "kind": "dragon", "x": 660, "y": 770, "scale": 0.5}
+  ],
+  "steps": [
+    {
+      "type": "say",
+      "pitch": 0.55,
+      "text": "Grrr… J'ai faim ! Je ne laisse passer que ceux qui partagent leur goûter !"
+    },
+    {"type": "say", "text": "Nous avons un gâteau magique ! On le partage ?"},
+    {"type": "use", "reward": "cake", "to": {"x": 360, "y": 560}},
+    {"type": "slot", "name": "share_first"},
+    {"type": "slot", "name": "share_second"},
+    {
+      "type": "say",
+      "pitch": 0.55,
+      "text": "Miam ! Merci les amis. Partager, c'est encore meilleur ! Vous pouvez passer."
+    }
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour continuer le voyage !"},
+  "generator": "troll",
+  "config": {
+    "per_min": 2,
+    "per_max": 3,
+    "pile": {"x": 360, "y": 610},
+    "count_words": ["Un !", "Deux !", "Trois !", "Quatre !", "Cinq !", "Six !", "Sept !", "Huit !", "Neuf !", "Dix !"],
+    "plates2": [{"x": 1050, "y": 880}, {"x": 1330, "y": 880}],
+    "plates3": [{"x": 660, "y": 880}, {"x": 1050, "y": 880}, {"x": 1330, "y": 880}],
+    "lines": {
+      "share2": "{name}, il y a {n} parts de gâteau. Donne-les au troll et à son petit frère : pareil pour chacun ! Touche une assiette.",
+      "done2": "Bravo {name} ! {k} parts chacun, c'est juste !",
+      "share3": "{name}, encore {n} parts, pour le troll, son petit frère et Pilou. Pareil pour tout le monde !",
+      "done3": "Bravo {name} ! Tout le monde a {k} parts !",
+      "full": "Celui-là en a assez ! Donne à quelqu'un d'autre."
+    }
+  }
+}

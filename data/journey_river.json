@@ -1,0 +1,54 @@
+{
+  "_meta": {"version": "0.1", "description": "Le voyage 4 : la rivière qui chante"},
+  "id": "journey_river",
+  "reward": "",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 800, "y": 220}},
+  "view": {
+    "backdrop": "river",
+    "decor": [
+      {"type": "tree", "x": 130, "y": 545},
+      {"type": "tree", "x": 1470, "y": 545},
+      {"type": "reed", "x": 1320, "y": 712}
+    ]
+  },
+  "items": [
+    {"id": "ice", "kind": "ice", "x": 800, "y": 705},
+    {"id": "pilou", "kind": "dragon", "x": 1430, "y": 470, "scale": 0.45}
+  ],
+  "steps": [
+    {"type": "say", "text": "Oh non ! La rivière s'est endormie, elle est toute gelée. On ne peut pas traverser !"},
+    {
+      "type": "use",
+      "reward": "potion",
+      "to": {"x": 800, "y": 620},
+      "line": "Une goutte de potion magique… La rivière se réveille !",
+      "then_hide": ["ice"]
+    },
+    {
+      "type": "say",
+      "text": "Écoutez ! Les nénuphars chantent. Répétez leur chanson pour qu'ils nous fassent traverser."
+    },
+    {"type": "slot", "name": "simon"},
+    {"type": "say", "text": "La rivière est contente ! Les nénuphars nous font traverser, hop, hop, hop !"}
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour continuer le voyage !"},
+  "generator": "river",
+  "config": {
+    "pads": [
+      {"x": 410, "y": 690, "color": "#f48fb1"},
+      {"x": 670, "y": 690, "color": "#fdd835"},
+      {"x": 930, "y": 690, "color": "#4fc3f7"},
+      {"x": 1190, "y": 690, "color": "#ab47bc"}
+    ],
+    "rounds": [{"player": "first", "length": 2}, {"player": "second", "length": 3}, {"player": "both", "length": 3}],
+    "lines": {
+      "listen": "Écoute et regarde…",
+      "your_turn": "{name}, à toi ! Touche les nénuphars dans le même ordre.",
+      "your_turn_both": "À vous deux ! Touchez les nénuphars dans le même ordre.",
+      "good": ["Bravo, c'est la bonne chanson !", "Magnifique !", "Oui ! Les nénuphars sont contents !"],
+      "retry": "Presque ! On réécoute ensemble."
+    }
+  }
+}

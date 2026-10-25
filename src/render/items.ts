@@ -116,6 +116,7 @@ export function drawItem(parent: SVGGElement, def: ItemDef, defaultKind = 'mushr
   if (kind === 'mushroom') {
     const m = drawMushroom(parent, colorOf(def.color ?? 'red'));
     place(m.root, def.x, def.y, scale);
+    if (def.shadow) toShadow(m.body);
     return { ...m, w: MUSHROOM_W, h: MUSHROOM_H };
   }
   const root = el('g', {}, parent);
@@ -123,7 +124,15 @@ export function drawItem(parent: SVGGElement, def: ItemDef, defaultKind = 'mushr
   const body = el('g', { class: 'anim-base' }, root);
   const draw = DRAWERS[kind] ?? DRAWERS.shape;
   const { w, h } = draw(body, def);
+  if (def.shadow) toShadow(body);
   return { root, body, w, h };
+}
+
+/** Transforme le dessin en ombre (le filtre est sur un groupe intérieur pour ne pas gêner les effets). */
+function toShadow(body: SVGGElement): void {
+  const inner = el('g', { filter: 'url(#silhouette)' });
+  while (body.firstChild) inner.appendChild(body.firstChild);
+  body.appendChild(inner);
 }
 
 /** Fait briller un objet un instant (pour compter ou montrer). */

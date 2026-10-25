@@ -92,14 +92,16 @@ export class PlaceBase {
   /** Texte pour un joueur (ou pour le 1er joueur si c'est « les deux »). */
   protected text(t: TextByPlayer | undefined, player: PlayerId | 'both'): string {
     if (!t) return '';
+    // Un texte peut prévoir une version « both » (les deux enfants ensemble)
+    if (player === 'both' && typeof t === 'object' && t.both) return t.both;
     return resolveText(t, player === 'both' ? this.order()[0] : player);
   }
 
   /** Attend une action avec l'aide progressive de Lumi (répéter, voleter, se poser, aider). */
-  protected async withHints<T>(action: Interactive<T>, prompt: string, delays: number[], autoS?: number): Promise<T> {
+  protected async withHints<T>(action: Interactive<T>, prompt: string | (() => string), delays: number[], autoS?: number): Promise<T> {
     this.hints = new HintTimer(this.clock, delays, action.autoSolve ? autoS : undefined, (level: HintLevel) => {
       const target = action.hintTarget();
-      if (level === 0) void this.say(prompt, { prompt: true });
+      if (level === 0) void this.say(typeof prompt === 'function' ? prompt() : prompt, { prompt: true });
       else if (level === 1) {
         if (target) void this.lumi.hoverNear(target);
       } else if (level === 2) {

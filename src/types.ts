@@ -35,6 +35,8 @@ export interface ItemDef {
   rider_color?: string;
   /** Licorne : regarde vers la gauche. */
   flip?: boolean;
+  /** Dessiné comme une ombre (silhouette sombre). */
+  shadow?: boolean;
 }
 
 /** Ancien nom, gardé pour compatibilité. */
@@ -157,6 +159,14 @@ export interface LevelDef {
   finale: FinaleDef;
 }
 
+/** Chapitre 3 : le grand voyage (étapes dans un ordre fixe). */
+export interface JourneyDef {
+  _meta?: { version: string; description: string };
+  id: string;
+  /** Fichiers des étapes, dans l'ordre (la dernière est l'arrivée). */
+  steps: string[];
+}
+
 export interface PlayerDef {
   id: PlayerId;
   name: string;
@@ -169,6 +179,8 @@ export interface GameSettings {
   level: string;
   /** Chapitre 2 : le village (après la Porte). */
   village?: string;
+  /** Chapitre 3 : le grand voyage (après les 5 maisons). */
+  journey?: string;
   /** Scène seule (ancien mode, et ?scene=...). */
   scene?: string;
   first_player: PlayerId;
@@ -224,6 +236,9 @@ export interface VillageDef {
     prompt: string;
     closed: string;
     all_done: string;
+    /** Quand les 5 maisons sont finies : Pilou arrive (chapitre 3). */
+    journey_call?: string;
+    pilou_tap?: string;
   };
 }
 
@@ -303,6 +318,58 @@ export type StepDef =
       then_show?: string[];
     }
   | { type: 'parts'; parts: Record<PlayerId, StepDef[]> }
+  | {
+      /** Une récompense du sac sert dans la scène (elle vole du sac jusqu'ici). */
+      type: 'use';
+      reward: string;
+      to: Point;
+      scale?: number;
+      line?: TextByPlayer;
+      then_show?: string[];
+      then_hide?: string[];
+    }
+  | {
+      /** Jeu de mémoire : retrouver les paires, chacun son tour. */
+      type: 'memory';
+      faces: ItemDef[];
+      grid: { x: number; y: number; cols: number; cell: number };
+      turn: TextByPlayer;
+      match_lines: string[];
+      miss_line: string;
+      done_line?: string;
+    }
+  | {
+      /** Partager : donner autant de parts à chaque assiette. */
+      type: 'share';
+      player: StepPlayer;
+      prompt: TextByPlayer;
+      plates: Point[];
+      per_plate: number;
+      pile: Point;
+      full_line: string;
+      count_words?: string[];
+      success_line?: TextByPlayer;
+    }
+  | {
+      /** Suite de sons et de couleurs à répéter. */
+      type: 'simon';
+      pads: (Point & { color: string })[];
+      rounds: { player: StepPlayer; seq: number[] }[];
+      listen: string;
+      your_turn: TextByPlayer;
+      good_lines: string[];
+      retry_line: string;
+    }
+  | {
+      /** Gauche / droite / haut / bas : choisir le bon nuage. */
+      type: 'direction';
+      walkers: string[];
+      start: Point;
+      rounds: { player: StepPlayer; dir: 'left' | 'right' | 'up' | 'down'; to: Point; other: Point }[];
+      prompts: Record<string, TextByPlayer>;
+      wrong: Record<string, string>;
+      good_lines: string[];
+    }
   | { type: 'reward'; from: Point };
 
 export interface PlaceDef {

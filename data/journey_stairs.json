@@ -1,0 +1,52 @@
+{
+  "_meta": {"version": "0.1", "description": "Le voyage 5 : l'escalier de nuages"},
+  "id": "journey_stairs",
+  "reward": "",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 1150, "y": 180}},
+  "view": {
+    "backdrop": "sky",
+    "decor": [{"type": "cloud_floor", "x": 800, "y": 940}, {"type": "castle", "x": 1420, "y": 360, "scale": 0.3}]
+  },
+  "items": [
+    {"id": "unicorn_elea", "kind": "unicorn", "x": 750, "y": 860, "scale": 0.36, "rider": "auto", "hidden": true},
+    {"id": "unicorn_isao", "kind": "unicorn", "x": 860, "y": 860, "scale": 0.36, "rider": "auto", "hidden": true},
+    {"id": "pilou", "kind": "dragon", "x": 220, "y": 420, "scale": 0.45}
+  ],
+  "steps": [
+    {"type": "say", "text": "Voici l'escalier de nuages qui monte jusqu'au château !"},
+    {
+      "type": "use",
+      "reward": "horseshoes",
+      "to": {"x": 800, "y": 780},
+      "line": "Les fers à cheval magiques ! Avec eux, les licornes peuvent marcher sur les nuages.",
+      "then_show": ["unicorn_elea", "unicorn_isao"]
+    },
+    {"type": "slot", "name": "stairs"},
+    {"type": "say", "text": "Nous sommes tout en haut ! Regardez, le château arc-en-ciel !"}
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour continuer le voyage !"},
+  "generator": "stairs",
+  "config": {
+    "start": {"x": 800, "y": 860},
+    "dx": 280,
+    "dy": 130,
+    "rounds": 4,
+    "up_down": true,
+    "min_x": 450,
+    "max_x": 1150,
+    "walkers": ["unicorn_elea", "unicorn_isao"],
+    "lines": {
+      "go_left": "{name}, saute sur le nuage de gauche ! La gauche, c'est du côté d'Elea.",
+      "go_right": "{name}, saute sur le nuage de droite ! La droite, c'est du côté d'Isao.",
+      "go_up": "{name}, saute sur le nuage du haut, tout en haut !",
+      "go_down": "{name}, saute sur le nuage du bas !",
+      "wrong_left": "Ça, c'est la droite. La gauche, c'est de ce côté, vers Elea !",
+      "wrong_right": "Ça, c'est la gauche. La droite, c'est de ce côté, vers Isao !",
+      "wrong_up": "Plus haut ! Le nuage tout en haut !",
+      "wrong_down": "Plus bas !",
+      "good": ["Hop !", "Bravo, c'est ça !", "Super saut !", "Bien joué !"]
+    }
+  }
+}

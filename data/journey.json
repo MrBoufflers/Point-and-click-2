@@ -1,0 +1,12 @@
+{
+  "_meta": {"version": "0.1", "description": "Le grand voyage avec Pilou"},
+  "id": "journey_1",
+  "steps": [
+    "journey_forest.json",
+    "journey_bridge.json",
+    "journey_troll.json",
+    "journey_river.json",
+    "journey_stairs.json",
+    "journey_castle.json"
+  ]
+}

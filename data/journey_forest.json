@@ -1,0 +1,74 @@
+{
+  "_meta": {"version": "0.1", "description": "Le voyage 1 : la forêt des paires"},
+  "id": "journey_forest",
+  "reward": "",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 800, "y": 200}},
+  "view": {
+    "backdrop": "forest",
+    "decor": [
+      {"type": "tree", "x": 130, "y": 560, "scale": 1.1},
+      {"type": "tree", "x": 1470, "y": 560, "scale": 1.15},
+      {"type": "pine", "x": 330, "y": 480, "scale": 0.6},
+      {"type": "pine", "x": 1270, "y": 480, "scale": 0.6}
+    ]
+  },
+  "items": [
+    {"id": "unicorn_elea", "kind": "unicorn", "x": 280, "y": 880, "scale": 0.5, "rider": "auto", "hidden": true},
+    {"id": "unicorn_isao", "kind": "unicorn", "x": 1320, "y": 880, "scale": 0.5, "rider": "auto", "hidden": true},
+    {"id": "pilou", "kind": "dragon", "x": 1430, "y": 470, "scale": 0.45}
+  ],
+  "steps": [
+    {
+      "type": "say",
+      "pitch": 1.6,
+      "text": "Bonjour ! Je suis Pilou, un petit dragon-nuage. Je me suis perdu… Ma maison, c'est le château arc-en-ciel, tout en haut du ciel. Vous m'aidez à rentrer ?"
+    },
+    {"type": "say", "text": "Bien sûr, Pilou ! On part avec nos licornes."},
+    {
+      "type": "use",
+      "reward": "unicorns",
+      "to": {"x": 800, "y": 720},
+      "line": "Les licornes sont là ! Hop, en selle !",
+      "then_show": ["unicorn_elea", "unicorn_isao"]
+    },
+    {
+      "type": "say",
+      "text": "La forêt magique a caché le chemin sous des cartes. Retrouvez les paires pareilles pour l'ouvrir !"
+    },
+    {"type": "slot", "name": "memory"},
+    {"type": "say", "text": "Le chemin est ouvert ! Bravo l'équipe !"}
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour continuer le voyage !"},
+  "generator": "tracks",
+  "config": {
+    "faces": [
+      {"id": "star", "kind": "star", "color": "#ffca28"},
+      {"id": "feather", "kind": "feather", "color": "#1e88e5"},
+      {"id": "leaf", "kind": "leaf", "color": "#43a047"},
+      {"id": "mushroom", "kind": "mushroom", "color": "red", "scale": 0.75},
+      {"id": "flower", "kind": "flower", "color": "#ec407a", "scale": 0.7},
+      {"id": "crystal", "kind": "crystal", "color": "#4dd0e1"},
+      {"id": "heart", "kind": "shape", "shape": "heart", "color": "#e53935"},
+      {"id": "cherry", "kind": "cherry"},
+      {"id": "strawberry", "kind": "strawberry"},
+      {"id": "bottle", "kind": "bottle", "color": "#ab47bc", "scale": 0.8},
+      {"id": "horseshoe", "kind": "horseshoe", "color": "#ffca28", "scale": 0.8},
+      {"id": "moon", "kind": "shape", "shape": "circle", "color": "#fff59d"}
+    ],
+    "pairs_min": 3,
+    "pairs_max": 4,
+    "grid": {"x": 800, "y": 450, "cell": 200},
+    "lines": {
+      "turn": "{name}, retourne deux cartes !",
+      "match": ["Bravo, une paire !", "Pareilles ! Bien joué !", "Super, elles sont pareilles !"],
+      "miss": "Pas pareilles. On les retourne !",
+      "done": "Toutes les paires sont trouvées !"
+    }
+  },
+  "ambient_hotspots": [
+    {"id": "owl", "x": 130, "y": 300, "reaction": "blink"},
+    {"id": "bush", "x": 1470, "y": 650, "reaction": "shiver", "scale": 0.6}
+  ]
+}

@@ -41,6 +41,10 @@ function defs(d: SVGDefsElement): void {
   el('feMergeNode', { in: 'g' }, merge);
   el('feMergeNode', { in: 'SourceGraphic' }, merge);
 
+  // Ombre : tout devient bleu nuit, en gardant la transparence
+  const sil = el('filter', { id: 'silhouette' }, d);
+  el('feColorMatrix', { type: 'matrix', values: '0 0 0 0 0.08  0 0 0 0 0.08  0 0 0 0 0.16  0 0 0 0.9 0' }, sil);
+
   const radial = (id: string, stops: [number, string, number][]) => {
     const g = el('radialGradient', { id }, d);
     for (const [o, c, a] of stops) el('stop', { offset: o, 'stop-color': c, 'stop-opacity': a }, g);

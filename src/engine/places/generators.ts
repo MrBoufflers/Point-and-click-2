@@ -312,7 +312,115 @@ function forge(def: PlaceDef, c: Cfg, g: GenContext): GenResult {
   return finish(def, items, slots, memory);
 }
 
-const GENERATORS: Record<string, (def: PlaceDef, c: Cfg, g: GenContext) => GenResult> = { stable, potions, library, bakery, forge };
+// ================= Chapitre 3 : le grand voyage =================
+
+/** Forêt : jeu de mémoire avec 3 ou 4 paires tirées au hasard. */
+function tracks(def: PlaceDef, c: Cfg, g: GenContext): GenResult {
+  const n = intFresh(c.pairs_min ?? 3, c.pairs_max ?? 4, memNum(g.memory, 'p'));
+  const faces: Cfg[] = pickFresh(c.faces as Cfg[], n, (f) => f.id, g.memory);
+  const step = {
+    type: 'memory', faces: faces.map(({ id: _id, ...f }) => f), grid: { ...c.grid, cols: n <= 3 ? 3 : 4 }, turn: per(g.players, c.lines.turn),
+    match_lines: c.lines.match, miss_line: c.lines.miss, done_line: c.lines.done,
+  } as unknown as StepDef;
+  return finish(def, [], { memory: [step] }, [`p:${n}`, ...faces.map((f) => f.id)]);
+}
+
+/** Pont qui parle : 3 ombres à reconnaître (un objet + 2 autres de formes différentes). */
+function bridge(def: PlaceDef, c: Cfg, g: GenContext): GenResult {
+  const pool: Cfg[] = c.objects;
+  const targets = pickFresh(pool, 3, (o) => o.id, g.memory);
+  const who = ['first', 'second', 'both'] as const;
+  const xs: number[] = c.choice_xs;
+  const items: Item[] = [];
+  const steps: StepDef[] = [];
+  targets.forEach((t, r) => {
+    const others = shuffle(pool.filter((o) => o.kind !== t.kind && !targets.slice(r).includes(o))).slice(0, 2);
+    const choices = shuffle([t, ...others]);
+    const ids = choices.map((o, i) => `r${r}_${i}_${o.id}`);
+    choices.forEach((o, i) => items.push({ id: ids[i], kind: o.kind, color: o.color, x: xs[i], y: c.choice_y, scale: o.scale ?? 1, tap: true, hidden: true }));
+    steps.push({ type: 'show', ids });
+    steps.push({
+      type: 'pick', player: who[r], prompt: per(g.players, c.lines[`ask_${who[r]}`]), accept: [ids[choices.indexOf(t)]],
+      dest: { x: c.bubble.x, y: c.bubble.y + 40, scale: 0.8, vanish: true },
+      bubble: { x: c.bubble.x, y: c.bubble.y, item: { kind: t.kind, color: t.color, x: 0, y: 0, scale: (t.scale ?? 1) * 0.9, shadow: true } },
+      retry_line: c.lines.retry, success_line: fill(pickOne(c.lines.good as string[]), { thing: t.label }),
+    } as StepDef);
+    steps.push({ type: 'hide', ids });
+  });
+  return finish(def, items, { shadows: steps }, targets.map((t) => t.id));
+}
+
+/** Troll : partager les parts de gâteau (2 puis 3 assiettes). */
+function troll(def: PlaceDef, c: Cfg, g: GenContext): GenResult {
+  const a = intFresh(c.per_min ?? 1, c.per_max ?? 3, memNum(g.memory, 'a'));
+  const b = intFresh(c.per_min ?? 1, c.per_max ?? 3, memNum(g.memory, 'b'));
+  const mk = (player: string, plates: Cfg[], per_plate: number, tpl: string, done: string): StepDef => ({
+    type: 'share', player, prompt: per(g.players, tpl, { n: per_plate * plates.length, k: per_plate }), plates, per_plate,
+    pile: c.pile, full_line: c.lines.full, count_words: c.count_words, success_line: per(g.players, done, { k: per_plate }),
+  } as StepDef);
+  const slots = {
+    share_first: [mk('first', c.plates2, a, c.lines.share2, c.lines.done2)],
+    share_second: [mk('second', c.plates3, b, c.lines.share3, c.lines.done3)],
+  };
+  return finish(def, [], slots, [`a:${a}`, `b:${b}`]);
+}
+
+/** Rivière : suites de notes de plus en plus longues. */
+function river(def: PlaceDef, c: Cfg, g: GenContext): GenResult {
+  const pads: Cfg[] = c.pads;
+  const seq = (len: number) => {
+    const r: number[] = [];
+    while (r.length < len) {
+      const v = rnd(pads.length);
+      if (r[r.length - 1] !== v) r.push(v);
+    }
+    return r;
+  };
+  const rounds = (c.rounds as Cfg[]).map((r) => ({ player: r.player, seq: seq(r.length) }));
+  const step = { type: 'simon', pads, rounds, listen: c.lines.listen, your_turn: { ...(per(g.players, c.lines.your_turn) as Record<string, string>), both: c.lines.your_turn_both }, good_lines: c.lines.good, retry_line: c.lines.retry } as unknown as StepDef;
+  return finish(def, [], { simon: [step] }, rounds.map((r) => r.seq.join('')));
+}
+
+/** Escalier de nuages : une suite de directions, en restant dans l'écran. */
+function stairs(def: PlaceDef, c: Cfg, g: GenContext): GenResult {
+  const start: Cfg = c.start;
+  const dx: number = c.dx;
+  const dy: number = c.dy;
+  const n: number = c.rounds;
+  let at: Cfg = { x: start.x, y: start.y };
+  const rounds: Cfg[] = [];
+  for (let i = 0; i < n; i++) {
+    const useUpDown = i === n - 2 && c.up_down;
+    let dir: string;
+    let to: Cfg;
+    let other: Cfg;
+    if (useUpDown) {
+      dir = 'up';
+      to = { x: at.x, y: at.y - dy * 1.4 };
+      other = { x: at.x + (at.x < 800 ? dx : -dx), y: at.y + dy * 0.2 };
+    } else {
+      const canL = at.x - dx >= c.min_x;
+      const canR = at.x + dx <= c.max_x;
+      dir = canL && canR ? pickOne(['left', 'right']) : canL ? 'left' : 'right';
+      const sign = dir === 'left' ? -1 : 1;
+      to = { x: at.x + sign * dx, y: at.y - dy };
+      other = { x: at.x - sign * dx, y: at.y - dy };
+    }
+    rounds.push({ player: i % 2 ? 'second' : 'first', dir, to, other });
+    at = to;
+  }
+  const L: Cfg = c.lines;
+  const step = {
+    type: 'direction', walkers: c.walkers, start, rounds,
+    prompts: Object.fromEntries(['left', 'right', 'up', 'down'].map((d) => [d, per(g.players, L[`go_${d}`])])),
+    wrong: { left: L.wrong_left, right: L.wrong_right, up: L.wrong_up, down: L.wrong_down }, good_lines: L.good,
+  } as unknown as StepDef;
+  return finish(def, [], { stairs: [step] }, rounds.map((r) => r.dir));
+}
+
+const GENERATORS: Record<string, (def: PlaceDef, c: Cfg, g: GenContext) => GenResult> = {
+  stable, potions, library, bakery, forge, tracks, bridge, troll, river, stairs,
+};
 
 /** Prépare une visite : tire le contenu si le lieu a un générateur, sinon renvoie le lieu tel quel. */
 export function buildPlace(def: PlaceDef, g: GenContext): GenResult {

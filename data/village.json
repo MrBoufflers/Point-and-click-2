@@ -84,6 +84,8 @@
     "intro": "Vous avez passé la porte du pays de l'imaginaire ! Voici le village. Les habitants ont besoin de vous.",
     "prompt": "Touchez une maison pour la visiter !",
     "closed": "Cette maison est fermée pour l'instant.",
-    "all_done": "Bravo ! Vous avez aidé tout le village ! Vous pouvez retourner dans les maisons : ce sera un peu différent à chaque fois."
+    "all_done": "Bravo ! Vous avez aidé tout le village ! Vous pouvez retourner dans les maisons : ce sera un peu différent à chaque fois.",
+    "journey_call": "Ding, dong ! La grande cloche du village sonne ! Regardez, un petit dragon-nuage… C'est Pilou ! Il s'est perdu et veut rentrer chez lui, au château arc-en-ciel. Touchez la grosse flèche pour partir à l'aventure avec lui !",
+    "pilou_tap": "Bonjour ! Je suis Pilou ! On part ensemble ?"
   }
 }

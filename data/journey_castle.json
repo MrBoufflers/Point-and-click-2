@@ -1,0 +1,50 @@
+{
+  "_meta": {"version": "0.1", "description": "Le voyage 6 : le château arc-en-ciel"},
+  "id": "journey_castle",
+  "reward": "",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 1300, "y": 220}},
+  "view": {"backdrop": "castle", "decor": [{"type": "castle", "x": 800, "y": 700, "scale": 0.85}]},
+  "items": [
+    {"id": "pilou", "kind": "dragon", "x": 800, "y": 860, "scale": 0.6},
+    {
+      "id": "mama",
+      "kind": "dragon",
+      "color": "#f8bbd0",
+      "x": 1080,
+      "y": 640,
+      "scale": 0.9,
+      "flip": true,
+      "hidden": true
+    },
+    {"id": "papa", "kind": "dragon", "color": "#d1c4e9", "x": 520, "y": 640, "scale": 0.95, "hidden": true},
+    {"id": "v_apothecary", "kind": "npc", "npc": "apothecary", "x": 290, "y": 890, "scale": 0.42, "hidden": true},
+    {"id": "v_baker", "kind": "npc", "npc": "baker", "x": 450, "y": 890, "scale": 0.42, "hidden": true},
+    {"id": "v_librarian", "kind": "npc", "npc": "librarian", "x": 1150, "y": 890, "scale": 0.42, "hidden": true},
+    {"id": "v_smith", "kind": "npc", "npc": "smith", "x": 1320, "y": 890, "scale": 0.42, "hidden": true},
+    {"id": "unicorn_elea", "kind": "unicorn", "x": 590, "y": 890, "scale": 0.33, "rider": "auto", "hidden": true},
+    {"id": "unicorn_isao", "kind": "unicorn", "x": 1010, "y": 890, "scale": 0.33, "rider": "auto", "hidden": true}
+  ],
+  "steps": [
+    {"type": "say", "text": "Le château arc-en-ciel ! Pilou, tu es arrivé chez toi !"},
+    {"type": "say", "pitch": 1.6, "text": "Maman ! Papa !"},
+    {"type": "show", "ids": ["mama", "papa"]},
+    {
+      "type": "say",
+      "pitch": 1.25,
+      "text": "Pilou ! Te voilà ! Merci, Isao et Elea, d'avoir ramené notre petit dragon !"
+    },
+    {"type": "show", "ids": ["v_apothecary", "v_baker", "v_librarian", "v_smith", "unicorn_elea", "unicorn_isao"]},
+    {"type": "say", "text": "Tout le village est venu faire la fête !"},
+    {
+      "type": "two_touch",
+      "prompt": "Pour dire au revoir à Pilou, faites-lui un câlin : touchez-le tous les deux !",
+      "area": {"x": 800, "y": 780, "w": 260, "h": 200},
+      "success_line": "Pilou vous fait un gros câlin tout doux, comme un nuage !"
+    },
+    {"type": "say", "pitch": 1.6, "text": "Merci mes amis ! Revenez me voir quand vous voulez !"},
+    {"type": "say", "text": "Bravo Isao et Elea ! Vous avez ramené Pilou chez lui. Vous êtes de vrais héros !"}
+  ],
+  "lines": {"done": "Fin du grand voyage ! Touchez la grosse flèche pour retourner au village."}
+}
