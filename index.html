@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#0b1026" />
+    <title>Isao &amp; Elea — la Porte des 5 gemmes</title>
+  </head>
+  <body>
+    <div id="stage"></div>
+
+    <div id="hud" hidden>
+      <button id="gear" type="button" aria-label="Réglages parent (appui long 3 secondes)">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+          <circle class="ring" cx="26" cy="26" r="23" />
+          <g class="cog" transform="translate(26 26)">
+            <g id="cog-teeth"></g>
+            <circle r="11" />
+            <circle r="4.5" class="hole" />
+          </g>
+        </svg>
+      </button>
+      <button id="ear" type="button" aria-label="Répéter la consigne">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <path class="ear" d="M38 82 C 26 82 24 66 32 58 C 22 46 22 26 40 18 C 58 10 76 22 74 42 C 72 56 60 58 58 68 C 56 80 48 84 38 82 Z" />
+          <path class="ear-in" d="M42 56 C 36 50 38 36 48 34 C 58 32 62 44 54 50" />
+          <path class="wave" d="M82 36 Q 90 46 82 58" />
+          <path class="wave w2" d="M90 28 Q 102 46 90 66" />
+        </svg>
+      </button>
+    </div>
+
+    <button id="restart" type="button" aria-label="Recommencer" hidden>
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <path d="M95 60 A 35 35 0 1 1 84 34" fill="none" stroke="#3e2723" stroke-width="13" stroke-linecap="round" />
+        <polygon points="98,14 102,48 70,40" fill="#3e2723" />
+      </svg>
+    </button>
+
+    <div id="start">
+      <div id="stars"></div>
+      <button id="play" type="button" aria-label="Jouer" disabled>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="36,24 80,50 36,76" fill="#5d4037" stroke="#5d4037" stroke-width="8" stroke-linejoin="round" /></svg>
+      </button>
+      <p id="load-error" hidden></p>
+    </div>
+
+    <div id="panel" hidden>
+      <div class="card" role="dialog" aria-label="Réglages parent">
+        <h2>Réglages parent</h2>
+        <fieldset id="order"><legend>Qui commence ?</legend></fieldset>
+        <p class="note">L'ordre s'applique au prochain « Recommencer ».</p>
+        <label class="range">Volume de la voix <output id="vol-out"></output>
+          <input id="vol" type="range" min="0" max="1" step="0.05" />
+        </label>
+        <label class="range">Vitesse de la voix <output id="rate-out"></output>
+          <input id="rate" type="range" step="0.05" />
+        </label>
+        <div class="row">
+          <button id="test-voice" type="button">Tester la voix</button>
+          <button id="panel-restart" type="button">Recommencer</button>
+          <button id="panel-close" type="button" class="primary">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="rotate" aria-label="Tourne le téléphone">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <path class="arrow" d="M150 60 A 70 70 0 0 1 160 120" />
+        <polygon class="arrow-head" points="148,118 172,118 162,140" />
+        <g class="phone">
+          <rect x="70" y="40" width="60" height="110" rx="10" />
+          <circle cx="100" cy="138" r="5" />
+        </g>
+      </svg>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

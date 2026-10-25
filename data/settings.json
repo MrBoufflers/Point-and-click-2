@@ -1,0 +1,13 @@
+{
+  "_meta": { "version": "0.1", "description": "Valeurs par défaut du POC (surchargées par les réglages parent enregistrés sur l'appareil)" },
+  "scene": "scene_forest.json",
+  "first_player": "elea",
+  "players": [
+    { "id": "elea", "name": "Elea", "initial": "E", "color": "#ec407a", "side": "left" },
+    { "id": "isao", "name": "Isao", "initial": "I", "color": "#1e88e5", "side": "right" }
+  ],
+  "level_gems": ["red", "orange", "yellow", "green", "blue"],
+  "voice": { "lang": "fr-FR", "rate": 0.95, "volume": 1, "pitch": 1.15, "rate_min": 0.8, "rate_max": 1.1 },
+  "touch": { "min_target_px": 80, "hit_padding": 0.25 },
+  "gem_touch": { "two_finger_window_ms": 600, "single_hold_ms": 2000, "single_taps": 2 }
+}
