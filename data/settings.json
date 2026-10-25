@@ -4,6 +4,11 @@
   "village": "village.json",
   "journey": "journey.json",
   "prologue": "prologue.json",
+  "chapters": [
+    { "id": "start", "name": "1. Le début (les 5 gemmes)", "start": "prologue" },
+    { "id": "village", "name": "2. Le village", "start": "village" },
+    { "id": "dragon", "name": "3. L'aventure du dragon", "start": "journey" }
+  ],
   "first_player": "elea",
   "players": [
     { "id": "elea", "name": "Elea", "initial": "E", "color": "#ec407a", "side": "left" },

@@ -9,7 +9,7 @@ import { SceneRunner } from './engine/sceneRunner';
 import { Sfx } from './engine/sfx';
 import { Voice } from './engine/voice';
 import { loadJSON, loadPrefs, savePrefs, type Prefs } from './settings';
-import type { GameSettings, HouseDef, JourneyDef, LevelDef, PlaceDef, SceneDef, VillageDef } from './types';
+import type { ChapterDef, GameSettings, HouseDef, JourneyDef, LevelDef, PlaceDef, SceneDef, VillageDef } from './types';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -330,8 +330,28 @@ async function boot(): Promise<void> {
   if (game.level) boardNames.push(`${doorBoard + 1}. La Porte des 5 gemmes`);
   if (game.village) boardNames.push(`${villageBoard + 1}. ${game.village._meta?.description ?? 'Le village'}`);
   if (game.journey) boardNames.push(`${journeyBoard + 1}. ${game.journey._meta?.description ?? 'Le grand voyage'}`);
+  // Départ de chaque chapitre du menu parent (settings.json → "chapters").
+  // Nouveau chapitre : ajouter ici sa fonction de départ, et une ligne dans settings.json.
+  const chapterStarts: Record<string, () => void> = {
+    prologue: () => startPrologue(),
+    village: () => (game.village ? startVillage() : startBoard(0)),
+    journey: () => {
+      if (!game.journey) return startBoard(0);
+      prefs.journey.step = 0;
+      startJourney(0);
+    },
+  };
+  /** Chapitre en cours (pour le surligner dans le menu). */
+  const currentChapter = () => (current === journeyBoard ? 'journey' : current === villageBoard ? 'village' : 'prologue');
+
   setupParentPanel({
     settings, prefs, voice,
+    chapters: (settings.chapters ?? []).filter((c) => chapterStarts[c.start]),
+    currentChapter,
+    goChapter: (start) => {
+      $('start').hidden = true;
+      chapterStarts[start]?.();
+    },
     testLine: game.scenes[0].lines.voice_test ?? game.scenes[0].lines.gem_touch,
     boardNames,
     current: () => current,
@@ -416,9 +436,12 @@ interface PanelOptions {
   current: () => number;
   goTo: (board: number) => void;
   resetAll: () => void;
+  chapters: ChapterDef[];
+  currentChapter: () => string;
+  goChapter: (start: string) => void;
 }
 
-function setupParentPanel({ settings, prefs, voice, testLine, boardNames, current, goTo, resetAll }: PanelOptions): void {
+function setupParentPanel({ settings, prefs, voice, testLine, boardNames, current, goTo, resetAll, chapters, currentChapter, goChapter }: PanelOptions): void {
   const gear = $('gear');
   const panel = $('panel');
   const LONG_PRESS_MS = 3000;
@@ -454,6 +477,22 @@ function setupParentPanel({ settings, prefs, voice, testLine, boardNames, curren
     label.append(input, ` ${p.name} d'abord`);
     order.append(label);
   }
+
+  // Chapitres : un gros bouton par chapitre
+  const chapterBox = $('chapters');
+  const chapterButtons = chapters.map((c) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = c.name;
+    b.dataset.start = c.start;
+    b.addEventListener('click', () => {
+      panel.hidden = true;
+      goChapter(c.start);
+    });
+    chapterBox.append(b);
+    return b;
+  });
+  chapterBox.hidden = chapters.length === 0;
 
   // Choix du tableau
   const board = $<HTMLSelectElement>('board');
@@ -494,6 +533,7 @@ function setupParentPanel({ settings, prefs, voice, testLine, boardNames, curren
   const openPanel = () => {
     refresh();
     board.value = String(current());
+    chapterButtons.forEach((b) => b.classList.toggle('current', b.dataset.start === currentChapter()));
     panel.hidden = false;
   };
   const close = () => (panel.hidden = true);

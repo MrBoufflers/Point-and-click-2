@@ -609,6 +609,23 @@ body.is-fullscreen .fs-btn .fs-exit {
   padding: 6px 12px 10px;
   margin: 0;
 }
+#chapters {
+  flex-wrap: wrap;
+  margin-top: 8px !important;
+}
+#chapters button {
+  flex: 1 1 140px;
+  min-height: 46px;
+  border-radius: 10px;
+  border: 1px solid #7e57c2;
+  background: #ede7f6;
+  color: #311b92;
+  font: inherit;
+}
+#chapters button.current {
+  background: #7e57c2;
+  color: #fff;
+}
 #panel fieldset label {
   display: flex;
   align-items: center;

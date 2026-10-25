@@ -175,8 +175,17 @@ export interface PlayerDef {
   side: 'left' | 'right';
 }
 
+/** Un chapitre du menu parent. `start` dit où il commence (voir `chapterStarts` dans main.ts). */
+export interface ChapterDef {
+  id: string;
+  name: string;
+  start: string;
+}
+
 export interface GameSettings {
   level: string;
+  /** Menu « Aller au chapitre » des réglages parent. Ajouter ici chaque nouveau chapitre. */
+  chapters?: ChapterDef[];
   /** Chapitre 2 : le village (après la Porte). */
   village?: string;
   /** Chapitre 3 : le grand voyage (après les 5 maisons). */

@@ -117,7 +117,7 @@ Machine à états explicite dans `src/engine/sceneRunner.ts` :
 - **Erreurs** : aucun son d'erreur ni pénalité (le mauvais champignon fait « pouic » et dodeline, le mauvais panneau tremble et Lumi compte avec l'enfant).
 - **Gemme** : deux doigts (deux `pointerId`) dans une fenêtre de 600 ms déclenchent la fête ; un seul doigt aussi, après 2 s d'appui ou au 2e tap.
 - **Bouton oreille** (en haut à droite) : répète la dernière consigne en coupant la phrase en cours.
-- **Réglages parent** : appui long de 3 s sur l'engrenage (en haut à gauche). Ordre de passage, choix du tableau, volume et vitesse de la voix, recommencer. Enregistrés dans `localStorage`.
+- **Réglages parent** : appui long de 3 s sur l'engrenage (en haut à gauche). Ordre de passage, « Aller au chapitre » (le début, le village, l'aventure du dragon — liste dans `data/settings.json` → `chapters`), tableau précis, volume et vitesse de la voix, recommencer. Enregistrés dans `localStorage`.
 
 ## Architecture
 
