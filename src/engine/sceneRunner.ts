@@ -1,7 +1,7 @@
 import { AMBIENT } from '../render/ambient';
 import { Basket } from '../render/basket';
 import { confetti } from '../render/confetti';
-import { drawForest } from '../render/forest';
+import { drawBackdrop } from '../render/backdrop';
 import { GemBar } from '../render/gems';
 import { Lumi } from '../render/lumi';
 import { Portraits } from '../render/portraits';
@@ -29,6 +29,10 @@ export interface RunnerOptions {
   voice: Voice;
   sfx: Sfx;
   debug: boolean;
+  /** Gemmes déjà gagnées dans les tableaux précédents. */
+  filledGems?: string[];
+  /** 'next' : à la fin, Lumi attend la flèche « suivant » ; 'restart' : Lumi s'endort (fin de partie). */
+  endMode?: 'next' | 'restart';
   onState?: (s: SceneState) => void;
 }
 
@@ -47,7 +51,7 @@ export class SceneRunner {
   private stage: Stage;
   private input: Input;
   private lumi: Lumi;
-  private basket: Basket;
+  private basket: Basket | null;
   private portraits: Portraits;
   private gemBar: GemBar;
   private ambientIds: string[] = [];
@@ -60,11 +64,11 @@ export class SceneRunner {
     const { scene, settings } = o;
     this.stage = createStage(o.container);
     const L = this.stage.layers;
-    drawForest(L, scene);
+    drawBackdrop(L, scene);
     this.input = new Input(this.stage.svg, settings.touch, o.debug ? L.debug : null);
-    this.gemBar = new GemBar(L.hud, settings.level_gems);
+    this.gemBar = new GemBar(L.hud, settings.level_gems, (o.filledGems ?? []).filter((g) => g !== scene.gem));
     this.portraits = new Portraits(L.hud, settings.players);
-    this.basket = new Basket(L.basket, scene.basket);
+    this.basket = scene.basket ? new Basket(L.basket, scene.basket, scene.basket.style) : null;
     this.lumi = new Lumi(L.lumi, scene.lumi.home, { x: VIEW_W + 120, y: -80 });
 
     for (const def of scene.ambient_hotspots) {
@@ -80,11 +84,13 @@ export class SceneRunner {
     }
 
     // Les objets de tous les tours sont dessinés dès le début (inactifs), comme un vrai décor.
-    scene.turns.forEach((def) => {
-      const make = TURN_TYPES[def.type];
-      if (!make) throw new Error(`Type de tour inconnu : ${def.type}`);
-      const player = this.playerFor(def.player);
-      const ctx = this.makeContext(player);
+    scene.turns.forEach((raw, i) => {
+      const make = TURN_TYPES[raw.type];
+      if (!make) throw new Error(`Type de tour inconnu : ${raw.type}`);
+      const player = this.playerFor(raw.player);
+      // Champs propres au joueur qui joue ce tour (ex. la lettre de son prénom).
+      const def = { ...raw, ...(raw.by_player?.[player] ?? {}) } as TurnDefBase;
+      const ctx = this.makeContext(player, i);
       this.turns.push({ turn: make(ctx, def), def, player, ctx });
     });
   }
@@ -99,9 +105,10 @@ export class SceneRunner {
     return scenePlayer;
   }
 
-  private makeContext(player: PlayerId): TurnContext {
+  private makeContext(player: PlayerId, turnIndex: number): TurnContext {
     return {
       player,
+      turnIndex,
       scene: this.o.scene,
       settings: this.o.settings,
       layers: this.stage.layers,
@@ -188,8 +195,15 @@ export class SceneRunner {
     this.setState('end');
     this.input.disableAll();
     const dim = el('rect', { x: -800, y: -400, width: VIEW_W + 1600, height: VIEW_H + 800, fill: '#0b1026', opacity: 0 }, L.dim);
-    void animate(dim, [{ opacity: 0 }, { opacity: 0.55 }], { duration: 1500, fill: 'forwards' });
-    void this.lumi.sleep(scene.lumi.sleep_spot);
+    if (this.o.endMode === 'next') {
+      // Pause entre deux tableaux : Lumi attend près de la grosse flèche.
+      void animate(dim, [{ opacity: 0 }, { opacity: 0.35 }], { duration: 1200, fill: 'forwards' });
+      void this.lumi.flyTo(800, 250, 1200);
+      if (scene.lines.next) void this.say(scene.lines.next, { prompt: true });
+    } else {
+      void animate(dim, [{ opacity: 0 }, { opacity: 0.55 }], { duration: 1500, fill: 'forwards' });
+      void this.lumi.sleep(scene.lumi.sleep_spot ?? { x: 800, y: 250 });
+    }
   }
 
   /** Lance un tour avec l'aide progressive de Lumi ; se résout quand le tour est réussi. */

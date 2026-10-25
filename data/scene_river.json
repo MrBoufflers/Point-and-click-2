@@ -1,0 +1,86 @@
+{
+  "_meta": {"version": "0.1", "description": "Rivière des formes (gemme orange)"},
+  "id": "river_orange_gem",
+  "gem": "orange",
+  "backdrop": "river",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "gem_position": {"x": 800, "y": 420},
+  "lumi": {"home": {"x": 800, "y": 200}},
+  "decor": [
+    {"type": "pine", "x": 420, "y": 520, "scale": 0.6},
+    {"type": "pine", "x": 1170, "y": 515, "scale": 0.65},
+    {"type": "tree", "x": 150, "y": 545, "scale": 0.95},
+    {"type": "tree", "x": 1460, "y": 545, "scale": 1},
+    {"type": "bigrock", "x": 800, "y": 545},
+    {"type": "reed", "x": 330, "y": 712},
+    {"type": "reed", "x": 1270, "y": 712, "scale": 0.9},
+    {"type": "rock", "x": 560, "y": 545, "scale": 0.6},
+    {"type": "grass", "x": 980, "y": 545},
+    {"type": "grass", "x": 380, "y": 880},
+    {"type": "grass", "x": 1100, "y": 890}
+  ],
+  "turns": [
+    {
+      "player": "elea",
+      "type": "find_objects",
+      "object_kind": "shape",
+      "prompt": {
+        "elea": "Elea, à toi ! Trouve les 3 pierres rondes pour traverser la rivière.",
+        "isao": "Isao, à toi ! Trouve les 3 pierres rondes pour traverser la rivière."
+      },
+      "success_line": {"elea": "Bravo Elea ! On peut traverser !", "isao": "Bravo Isao ! On peut traverser !"},
+      "count_aloud": true,
+      "collect": "slots",
+      "hide_after": true,
+      "slots": [{"x": 600, "y": 670, "scale": 0.85}, {"x": 800, "y": 660, "scale": 0.85}, {"x": 1000, "y": 670, "scale": 0.85}],
+      "targets": [
+        {"id": "round_1", "shape": "circle", "x": 290, "y": 860, "color": "#90a4ae", "scale": 0.9},
+        {"id": "round_2", "shape": "circle", "x": 830, "y": 800, "color": "#90a4ae", "scale": 0.9},
+        {"id": "round_3", "shape": "circle", "x": 1190, "y": 800, "color": "#90a4ae", "scale": 0.9}
+      ],
+      "distractors": [
+        {"id": "square_1", "shape": "square", "x": 470, "y": 800, "color": "#90a4ae", "scale": 0.9},
+        {"id": "tri_1", "shape": "triangle", "x": 650, "y": 865, "color": "#90a4ae", "scale": 0.9},
+        {"id": "square_2", "shape": "square", "x": 1010, "y": 865, "color": "#90a4ae", "scale": 0.9},
+        {"id": "tri_2", "shape": "triangle", "x": 1360, "y": 865, "color": "#90a4ae", "scale": 0.9}
+      ]
+    },
+    {
+      "player": "isao",
+      "type": "choose_one",
+      "prompt": {
+        "elea": "Elea, à toi ! Quelle pierre rentre dans le trou du rocher ?",
+        "isao": "Isao, à toi ! Quelle pierre rentre dans le trou du rocher ?"
+      },
+      "display": [
+        {
+          "kind": "hole",
+          "shape": "triangle",
+          "x": 800,
+          "y": 470,
+          "missing": true,
+          "say": "Regarde le trou : il a trois pointes."
+        }
+      ],
+      "choices": [
+        {"id": "c_circle", "shape": "circle", "x": 500, "y": 850, "color": "#90a4ae"},
+        {"id": "c_square", "shape": "square", "x": 800, "y": 850, "color": "#90a4ae"},
+        {"id": "c_triangle", "shape": "triangle", "x": 1100, "y": 850, "color": "#90a4ae"}
+      ],
+      "answer": "c_triangle",
+      "success_line": "Oui ! Le triangle rentre dans le trou !",
+      "retry_line": "Regarde bien la forme du trou…"
+    }
+  ],
+  "ambient_hotspots": [
+    {"id": "frog", "x": 250, "y": 650, "reaction": "jump"},
+    {"id": "fish", "x": 1300, "y": 640, "reaction": "splash"},
+    {"id": "butterfly", "x": 1150, "y": 300, "reaction": "flutter", "color": "orange"},
+    {"id": "flower", "x": 1440, "y": 450, "reaction": "bloom", "color": "orange"}
+  ],
+  "lines": {
+    "intro": "Voici la rivière ! La gemme orange est cachée de l'autre côté. Il faut traverser !",
+    "celebration": "Bravo Isao et Elea ! Vous avez trouvé la gemme orange !"
+  }
+}

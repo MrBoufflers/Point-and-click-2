@@ -20,9 +20,10 @@ const SLOT_R = 36;
 
 /** Bandeau du haut : les 5 creux de gemmes du niveau. */
 export class GemBar {
-  private slots = new Map<string, { pos: Point; g: SVGGElement }>();
+  private slots = new Map<string, { pos: Point; g: SVGGElement; gem?: SVGGElement }>();
 
-  constructor(parent: SVGGElement, colors: string[]) {
+  /** `filled` : gemmes déjà gagnées (tableaux précédents). */
+  constructor(parent: SVGGElement, colors: string[], filled: string[] = []) {
     const n = colors.length;
     const step = 100;
     const width = n * step + 40;
@@ -37,6 +38,24 @@ export class GemBar {
       el('polygon', { points: '-0.55,-0.75 0.55,-0.75 1,-0.25 0,1 -1,-0.25', transform: `scale(${SLOT_R})`, fill: '#0d1440', stroke: colorOf(color), 'stroke-width': 0.08, 'stroke-dasharray': '0.18 0.12' }, hollow);
       this.slots.set(color, { pos, g });
     });
+    filled.forEach((c) => this.showGem(c));
+  }
+
+  /** Dessine directement une gemme gagnée dans son creux. */
+  showGem(color: string): void {
+    const s = this.slots.get(color);
+    if (!s || s.gem) return;
+    s.gem = el('g', { transform: `scale(${SLOT_R})` }, s.g);
+    drawGemShape(s.gem, color);
+  }
+
+  /** Retire la gemme de son creux (pour l'animer ailleurs) et renvoie sa position. */
+  takeGem(color: string): Point | null {
+    const s = this.slots.get(color);
+    if (!s?.gem) return null;
+    s.gem.remove();
+    s.gem = undefined;
+    return s.pos;
   }
 
   slotPosition(color: string): Point {

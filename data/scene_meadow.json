@@ -1,0 +1,76 @@
+{
+  "_meta": {"version": "0.1", "description": "Prairie des motifs (gemme verte)"},
+  "id": "meadow_green_gem",
+  "gem": "green",
+  "backdrop": "meadow",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "gem_position": {"x": 800, "y": 420},
+  "lumi": {"home": {"x": 800, "y": 190}},
+  "decor": [
+    {"type": "tree", "x": 140, "y": 560, "scale": 1.1},
+    {"type": "tree", "x": 1470, "y": 560, "scale": 1.15},
+    {"type": "bush", "x": 330, "y": 560, "scale": 0.6},
+    {"type": "bush", "x": 1270, "y": 560, "scale": 0.65},
+    {"type": "flowers", "x": 300, "y": 700},
+    {"type": "flowers", "x": 1300, "y": 690},
+    {"type": "flowers", "x": 680, "y": 640, "scale": 0.8},
+    {"type": "flowers", "x": 960, "y": 650, "scale": 0.8},
+    {"type": "grass", "x": 430, "y": 880},
+    {"type": "grass", "x": 1170, "y": 880}
+  ],
+  "turns": [
+    {
+      "player": "elea",
+      "type": "choose_one",
+      "prompt": {"elea": "Elea, à toi ! Quelle fleur vient après ?", "isao": "Isao, à toi ! Quelle fleur vient après ?"},
+      "display": [
+        {"kind": "flower", "color": "red", "scale": 0.9, "say": "Rouge", "x": 412, "y": 470},
+        {"kind": "flower", "color": "yellow", "scale": 0.9, "say": "jaune", "x": 568, "y": 470},
+        {"kind": "flower", "color": "red", "scale": 0.9, "say": "rouge", "x": 722, "y": 470},
+        {"kind": "flower", "color": "yellow", "scale": 0.9, "say": "jaune", "x": 878, "y": 470},
+        {"kind": "flower", "color": "red", "scale": 0.9, "say": "rouge", "x": 1032, "y": 470},
+        {"kind": "slot", "missing": true, "say": "Et après ?", "x": 1188, "y": 470}
+      ],
+      "choices": [
+        {"id": "f_red", "kind": "flower", "color": "red", "x": 560, "y": 850},
+        {"id": "f_blue", "kind": "flower", "color": "blue", "x": 800, "y": 850},
+        {"id": "f_yellow", "kind": "flower", "color": "yellow", "x": 1040, "y": 850}
+      ],
+      "answer": "f_yellow",
+      "success_line": "Oui ! Jaune ! Rouge, jaune, rouge, jaune !",
+      "retry_line": "Écoute avec moi…"
+    },
+    {
+      "player": "isao",
+      "type": "choose_one",
+      "prompt": {"elea": "Elea, à toi ! Quelle forme vient après ?", "isao": "Isao, à toi ! Quelle forme vient après ?"},
+      "display": [
+        {"kind": "shape", "shape": "circle", "color": "blue", "scale": 0.9, "say": "Rond", "x": 412, "y": 470},
+        {"kind": "shape", "shape": "square", "color": "orange", "scale": 0.9, "say": "carré", "x": 568, "y": 470},
+        {"kind": "shape", "shape": "triangle", "color": "green", "scale": 0.9, "say": "triangle", "x": 722, "y": 470},
+        {"kind": "shape", "shape": "circle", "color": "blue", "scale": 0.9, "say": "rond", "x": 878, "y": 470},
+        {"kind": "shape", "shape": "square", "color": "orange", "scale": 0.9, "say": "carré", "x": 1032, "y": 470},
+        {"kind": "slot", "missing": true, "say": "Et après ?", "x": 1188, "y": 470}
+      ],
+      "choices": [
+        {"id": "s_triangle", "shape": "triangle", "color": "green", "x": 560, "y": 850},
+        {"id": "s_circle", "shape": "circle", "color": "blue", "x": 800, "y": 850},
+        {"id": "s_star", "shape": "star", "color": "purple", "x": 1040, "y": 850}
+      ],
+      "answer": "s_triangle",
+      "success_line": "Oui ! Le triangle ! Rond, carré, triangle !",
+      "retry_line": "Écoute avec moi…"
+    }
+  ],
+  "ambient_hotspots": [
+    {"id": "butterfly", "x": 260, "y": 250, "reaction": "flutter", "color": "#ab47bc"},
+    {"id": "bird", "x": 1170, "y": 160, "reaction": "fly_away_and_back"},
+    {"id": "flower", "x": 110, "y": 470, "reaction": "bloom", "color": "#ffca28"},
+    {"id": "snail", "x": 1410, "y": 520, "reaction": "hide"}
+  ],
+  "lines": {
+    "intro": "Voici la prairie des motifs ! Les fleurs et les formes jouent à se suivre. Trouvons la gemme verte !",
+    "celebration": "Bravo Isao et Elea ! Vous avez trouvé la gemme verte !"
+  }
+}

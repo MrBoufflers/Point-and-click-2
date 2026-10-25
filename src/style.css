@@ -162,6 +162,45 @@ button {
   animation: halo 1.4s ease-in-out infinite;
 }
 
+.hint-glow {
+  filter: url(#glow);
+}
+.leaf-left,
+.leaf-right {
+  transform-box: fill-box;
+}
+.leaf-left {
+  transform-origin: 0% 50%;
+}
+.leaf-right {
+  transform-origin: 100% 50%;
+}
+.bfly-wing {
+  animation: bfly 1.4s ease-in-out infinite alternate;
+}
+.fluttering .bfly-wing {
+  animation-duration: 0.12s;
+}
+@keyframes bfly {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.6); }
+}
+.bat-wings {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.wave {
+  animation: wave 2.5s ease-in-out infinite alternate;
+}
+@keyframes wave {
+  from { transform: translateX(-12px); }
+  to { transform: translateX(12px); }
+}
+.sun {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: halo 4s ease-in-out infinite;
+}
 .bird-wing.flapping {
   animation: flap 0.12s linear infinite alternate;
 }
@@ -240,7 +279,8 @@ button {
   stroke-dashoffset: 0;
 }
 
-#restart {
+#restart,
+#next {
   position: fixed;
   z-index: 10;
   left: 50%;
@@ -257,7 +297,8 @@ button {
   align-items: center;
   justify-content: center;
 }
-#restart svg {
+#restart svg,
+#next svg {
   width: 120px;
   height: 120px;
 }
@@ -414,6 +455,13 @@ button {
   display: block;
   margin: 6px 0;
 }
+#panel select {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  font: inherit;
+  margin-top: 4px;
+}
 #panel .range input {
   display: block;
   width: 100%;
@@ -440,7 +488,8 @@ button {
 
 /* ---------- ?debug=1 ---------- */
 body.debug #hud button,
-body.debug #restart {
+body.debug #restart,
+body.debug #next {
   outline: 2px dashed #00e676;
   outline-offset: 0;
 }

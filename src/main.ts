@@ -1,9 +1,10 @@
 import './style.css';
+import { FinaleRunner } from './engine/finale';
 import { SceneRunner } from './engine/sceneRunner';
 import { Sfx } from './engine/sfx';
 import { Voice } from './engine/voice';
 import { loadJSON, loadPrefs, savePrefs, type Prefs } from './settings';
-import type { GameSettings, SceneDef } from './types';
+import type { GameSettings, LevelDef, SceneDef } from './types';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -13,7 +14,9 @@ document.body.classList.toggle('debug', debug);
 
 // Pas de zoom, pas de menu contextuel, pas de sélection, pas de défilement.
 for (const ev of ['contextmenu', 'selectstart', 'dragstart', 'gesturestart', 'dblclick']) {
-  document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+  document.addEventListener(ev, (e) => {
+    if (!(e.target as HTMLElement).closest?.('#panel')) e.preventDefault();
+  }, { passive: false });
 }
 document.addEventListener('touchmove', (e) => {
   if (!(e.target as HTMLElement).closest?.('#panel')) e.preventDefault();
@@ -29,13 +32,30 @@ boot().catch((err: unknown) => {
   p.textContent = `Erreur de chargement : ${err instanceof Error ? err.message : String(err)}`;
 });
 
+const isFile = (f: string | null): f is string => !!f && /^[\w-]+\.json$/.test(f);
+
+/** Ce qui se joue : un niveau (suite de tableaux + Porte) ou une scène seule (?scene=...). */
+interface Game {
+  scenes: SceneDef[];
+  level: LevelDef | null;
+}
+
+async function loadGame(settings: GameSettings): Promise<Game> {
+  const level = await loadJSON<LevelDef>(`./data/${settings.level}`);
+  const single = params.get('scene');
+  const files = isFile(single) ? [single] : level.scenes;
+  const scenes = await Promise.all(files.map((f) => loadJSON<SceneDef>(`./data/${f}`)));
+  // Les phrases communes du niveau complètent celles de chaque scène.
+  for (const s of scenes) s.lines = { ...level.lines, ...s.lines } as SceneDef['lines'];
+  return { scenes, level: isFile(single) ? null : level };
+}
+
 async function boot(): Promise<void> {
   const settings = await loadJSON<GameSettings>('./data/settings.json');
-  // ?scene=autre.json permet d'essayer un autre fichier de scène de même structure.
-  const requested = params.get('scene');
-  const sceneFile = requested && /^[\w-]+\.json$/.test(requested) ? requested : settings.scene;
-  const scene = await loadJSON<SceneDef>(`./data/${sceneFile}`);
+  const game = await loadGame(settings);
   const prefs = loadPrefs(settings);
+  const lastBoard = game.level ? game.scenes.length : game.scenes.length - 1;
+  if (prefs.board > lastBoard) prefs.board = 0;
 
   const voice = new Voice(settings.voice.lang);
   voice.pitch = settings.voice.pitch;
@@ -47,32 +67,58 @@ async function boot(): Promise<void> {
   const hud = $('hud');
   const ear = $('ear');
   const restart = $('restart');
-  let runner: SceneRunner | null = null;
+  const next = $('next');
+  let runner: SceneRunner | FinaleRunner | null = null;
+  let current = 0;
 
   voice.onSpeakingChange = (b) => runner?.setSpeaking(b);
 
-  const startScene = () => {
+  const save = (board: number) => {
+    prefs.board = board;
+    savePrefs(prefs);
+  };
+
+  /** Lance le tableau n° `board` (le dernier numéro = la Porte). */
+  const startBoard = (board: number) => {
     runner?.dispose();
+    current = Math.max(0, Math.min(board, lastBoard));
+    save(current);
     restart.hidden = true;
+    next.hidden = true;
     hud.hidden = false;
     ear.hidden = false;
-    runner = new SceneRunner({
-      container: stageEl,
-      scene,
-      settings,
-      prefs,
-      voice,
-      sfx,
-      debug,
-      onState: (s) => {
-        if (s === 'end') {
+    const gemsBefore = game.scenes.slice(0, current).map((s) => s.gem);
+
+    if (game.level && current === game.scenes.length) {
+      runner = new FinaleRunner({
+        container: stageEl, finale: game.level.finale, settings, voice, sfx, debug, gems: gemsBefore,
+        onState: (s) => {
+          if (s !== 'end') return;
+          save(0); // la prochaine partie repart du début
           ear.hidden = true;
           restart.hidden = false;
-        }
-      },
-    });
+        },
+      });
+    } else {
+      const isLastScene = current === game.scenes.length - 1;
+      const endMode = game.level || !isLastScene ? 'next' : 'restart';
+      runner = new SceneRunner({
+        container: stageEl, scene: game.scenes[current], settings, prefs, voice, sfx, debug,
+        filledGems: gemsBefore, endMode,
+        onState: (s) => {
+          if (s !== 'end') return;
+          ear.hidden = true;
+          if (endMode === 'next') {
+            save(current + 1);
+            next.hidden = false;
+          } else {
+            restart.hidden = false;
+          }
+        },
+      });
+    }
     runner.start();
-    if (debug) (window as unknown as { __runner: SceneRunner }).__runner = runner;
+    if (debug) (window as unknown as { __runner: unknown }).__runner = runner;
   };
 
   // ---- Écran de démarrage ----
@@ -84,12 +130,16 @@ async function boot(): Promise<void> {
     voice.unlock();
     requestFullscreen();
     $('start').hidden = true;
-    startScene(); // dit la première phrase immédiatement
+    startBoard(prefs.board); // dit la première phrase immédiatement
   });
 
   restart.addEventListener('click', () => {
     sfx.unlock();
-    startScene();
+    startBoard(0);
+  });
+  next.addEventListener('click', () => {
+    sfx.unlock();
+    startBoard(current + 1);
   });
 
   ear.addEventListener('pointerdown', (e) => {
@@ -98,7 +148,18 @@ async function boot(): Promise<void> {
     voice.repeat();
   });
 
-  setupParentPanel(settings, prefs, voice, scene, startScene);
+  const boardNames = game.scenes.map((s, i) => `${i + 1}. ${s._meta?.description ?? s.id}`);
+  if (game.level) boardNames.push(`${game.scenes.length + 1}. La Porte des 5 gemmes`);
+  setupParentPanel({
+    settings, prefs, voice,
+    testLine: game.scenes[0].lines.voice_test ?? game.scenes[0].lines.gem_touch,
+    boardNames,
+    current: () => current,
+    goTo: (b) => {
+      $('start').hidden = true;
+      startBoard(b);
+    },
+  });
 }
 
 function requestFullscreen(): void {
@@ -115,7 +176,17 @@ function requestFullscreen(): void {
 
 // ---------------- Réglages parent ----------------
 
-function setupParentPanel(settings: GameSettings, prefs: Prefs, voice: Voice, scene: SceneDef, restartScene: () => void): void {
+interface PanelOptions {
+  settings: GameSettings;
+  prefs: Prefs;
+  voice: Voice;
+  testLine: string;
+  boardNames: string[];
+  current: () => number;
+  goTo: (board: number) => void;
+}
+
+function setupParentPanel({ settings, prefs, voice, testLine, boardNames, current, goTo }: PanelOptions): void {
   const gear = $('gear');
   const panel = $('panel');
   const LONG_PRESS_MS = 3000;
@@ -152,6 +223,15 @@ function setupParentPanel(settings: GameSettings, prefs: Prefs, voice: Voice, sc
     order.append(label);
   }
 
+  // Choix du tableau
+  const board = $<HTMLSelectElement>('board');
+  boardNames.forEach((name, i) => {
+    const o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = name;
+    board.append(o);
+  });
+
   const vol = $<HTMLInputElement>('vol');
   const volOut = $<HTMLOutputElement>('vol-out');
   const rate = $<HTMLInputElement>('rate');
@@ -181,15 +261,23 @@ function setupParentPanel(settings: GameSettings, prefs: Prefs, voice: Voice, sc
 
   const openPanel = () => {
     refresh();
+    board.value = String(current());
     panel.hidden = false;
   };
   const close = () => (panel.hidden = true);
   $('panel-close').addEventListener('click', close);
-  $('test-voice').addEventListener('click', () => void voice.say(scene.lines.voice_test ?? scene.lines.gem_touch));
+  $('test-voice').addEventListener('click', () => void voice.say(testLine));
   $('panel-restart').addEventListener('click', () => {
     close();
-    $('start').hidden = true;
-    restartScene();
+    goTo(current());
+  });
+  $('panel-go').addEventListener('click', () => {
+    close();
+    goTo(Number(board.value));
+  });
+  $('panel-reset').addEventListener('click', () => {
+    close();
+    goTo(0);
   });
   panel.addEventListener('pointerdown', (e) => {
     if (e.target === panel) close();

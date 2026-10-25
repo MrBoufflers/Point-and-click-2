@@ -1,0 +1,112 @@
+{
+  "_meta": {"version": "0.1", "description": "Grotte des lettres (gemme jaune)"},
+  "id": "cave_yellow_gem",
+  "gem": "yellow",
+  "backdrop": "cave",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "gem_position": {"x": 800, "y": 420},
+  "lumi": {"home": {"x": 800, "y": 250}},
+  "decor": [
+    {"type": "stalactite", "x": 230, "y": -10},
+    {"type": "stalactite", "x": 620, "y": 20, "scale": 0.8},
+    {"type": "stalactite", "x": 1020, "y": 10, "scale": 0.9},
+    {"type": "stalactite", "x": 1380, "y": -20},
+    {"type": "crystal", "x": 520, "y": 560, "color": "#fdd835", "scale": 0.7},
+    {"type": "crystal", "x": 1080, "y": 555, "color": "#b388ff", "scale": 0.6},
+    {"type": "rock", "x": 700, "y": 880, "color": "#5d4f6e"},
+    {"type": "rock", "x": 1250, "y": 880, "color": "#5d4f6e", "scale": 0.8}
+  ],
+  "turns": [
+    {
+      "player": "elea",
+      "type": "find_objects",
+      "object_kind": "letter",
+      "prompt": {
+        "elea": "Elea, à toi ! Trouve les 3 lettres E, comme Elea !",
+        "isao": "Isao, à toi ! Trouve les 3 lettres I, comme Isao !"
+      },
+      "success_line": {"elea": "Bravo Elea ! E, comme Elea !", "isao": "Bravo Isao ! I, comme Isao !"},
+      "count_aloud": true,
+      "collect": "glow",
+      "hide_after": true,
+      "targets": [
+        {"id": "E_1", "letter": "E", "x": 440, "y": 775, "color": "#80deea"},
+        {"id": "E_4", "letter": "E", "x": 980, "y": 650, "color": "#ffcc80"},
+        {"id": "E_6", "letter": "E", "x": 1340, "y": 650, "color": "#fff59d"}
+      ],
+      "distractors": [
+        {"id": "A_0", "letter": "A", "x": 260, "y": 650, "color": "#fff59d"},
+        {"id": "O_2", "letter": "O", "x": 620, "y": 645, "color": "#f48fb1"},
+        {"id": "M_3", "letter": "M", "x": 800, "y": 765, "color": "#c5e1a5"},
+        {"id": "L_5", "letter": "L", "x": 1160, "y": 775, "color": "#b39ddb"}
+      ],
+      "by_player": {
+        "isao": {
+          "targets": [
+            {"id": "I_0", "letter": "I", "x": 260, "y": 650, "color": "#fff59d"},
+            {"id": "I_3", "letter": "I", "x": 800, "y": 765, "color": "#c5e1a5"},
+            {"id": "I_5", "letter": "I", "x": 1160, "y": 775, "color": "#b39ddb"}
+          ],
+          "distractors": [
+            {"id": "A_1", "letter": "A", "x": 440, "y": 775, "color": "#80deea"},
+            {"id": "M_2", "letter": "M", "x": 620, "y": 645, "color": "#f48fb1"},
+            {"id": "O_4", "letter": "O", "x": 980, "y": 650, "color": "#ffcc80"},
+            {"id": "U_6", "letter": "U", "x": 1340, "y": 650, "color": "#fff59d"}
+          ]
+        }
+      }
+    },
+    {
+      "player": "isao",
+      "type": "find_objects",
+      "object_kind": "letter",
+      "prompt": {
+        "elea": "Elea, à toi ! Trouve les 3 lettres E, comme Elea !",
+        "isao": "Isao, à toi ! Trouve les 3 lettres I, comme Isao !"
+      },
+      "success_line": {"elea": "Bravo Elea ! E, comme Elea !", "isao": "Bravo Isao ! I, comme Isao !"},
+      "count_aloud": true,
+      "collect": "glow",
+      "hide_after": true,
+      "show_from_start": false,
+      "targets": [
+        {"id": "I_1", "letter": "I", "x": 440, "y": 775, "color": "#80deea"},
+        {"id": "I_4", "letter": "I", "x": 980, "y": 650, "color": "#ffcc80"},
+        {"id": "I_6", "letter": "I", "x": 1340, "y": 650, "color": "#fff59d"}
+      ],
+      "distractors": [
+        {"id": "U_0", "letter": "U", "x": 260, "y": 650, "color": "#fff59d"},
+        {"id": "O_2", "letter": "O", "x": 620, "y": 645, "color": "#f48fb1"},
+        {"id": "A_3", "letter": "A", "x": 800, "y": 765, "color": "#c5e1a5"},
+        {"id": "M_5", "letter": "M", "x": 1160, "y": 775, "color": "#b39ddb"}
+      ],
+      "by_player": {
+        "elea": {
+          "targets": [
+            {"id": "E_0", "letter": "E", "x": 260, "y": 650, "color": "#fff59d"},
+            {"id": "E_2", "letter": "E", "x": 620, "y": 645, "color": "#f48fb1"},
+            {"id": "E_5", "letter": "E", "x": 1160, "y": 775, "color": "#b39ddb"}
+          ],
+          "distractors": [
+            {"id": "O_1", "letter": "O", "x": 440, "y": 775, "color": "#80deea"},
+            {"id": "A_3", "letter": "A", "x": 800, "y": 765, "color": "#c5e1a5"},
+            {"id": "U_4", "letter": "U", "x": 980, "y": 650, "color": "#ffcc80"},
+            {"id": "M_6", "letter": "M", "x": 1340, "y": 650, "color": "#fff59d"}
+          ]
+        }
+      }
+    }
+  ],
+  "ambient_hotspots": [
+    {"id": "bat_1", "x": 330, "y": 190, "reaction": "flap"},
+    {"id": "bat_2", "x": 1220, "y": 200, "reaction": "flap"},
+    {"id": "crystal_1", "x": 110, "y": 560, "reaction": "shine", "color": "#fdd835"},
+    {"id": "crystal_2", "x": 1490, "y": 580, "reaction": "shine", "color": "#4dd0e1"},
+    {"id": "snail", "x": 800, "y": 545, "reaction": "hide"}
+  ],
+  "lines": {
+    "intro": "Oh, une grotte ! Des lettres magiques brillent dans le noir. La gemme jaune est cachée ici !",
+    "celebration": "Bravo Isao et Elea ! Vous avez trouvé la gemme jaune !"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "_meta": {"version": "0.1", "description": "Niveau 1 : cinq tableaux, cinq gemmes, puis la Porte"},
+  "id": "level_1",
+  "scenes": ["scene_forest.json", "scene_river.json", "scene_cave.json", "scene_meadow.json", "scene_mountain.json"],
+  "lines": {
+    "gem_touch": "Touchez-la tous les deux !",
+    "count": ["Un !", "Deux !", "Trois !", "Quatre !", "Cinq !", "Six !", "Sept !", "Huit !", "Neuf !", "Dix !"],
+    "auto_help": "Je vais t'aider !",
+    "voice_test": "Bonjour, je suis Lumi !",
+    "next": "Touchez la grosse flèche pour continuer !"
+  },
+  "finale": {
+    "door": {"x": 800, "y": 800},
+    "hint_delays_s": [8, 15, 25],
+    "auto_solve_after_s": 35,
+    "lumi": {"home": {"x": 1200, "y": 300}, "sleep_spot": {"x": 1250, "y": 560}},
+    "lines": {
+      "intro": "Voici la Porte des 5 gemmes ! Regardez, chaque gemme rentre à sa place.",
+      "touch": "Touchez la porte tous les deux pour l'ouvrir !",
+      "celebration": "Bravo Isao et Elea ! Vous avez ouvert la Porte des 5 gemmes ! Vous êtes une super équipe !"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "_meta": {"version": "0.1", "description": "Montagne des étoiles (gemme bleue)"},
+  "id": "mountain_blue_gem",
+  "gem": "blue",
+  "backdrop": "mountain",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "gem_position": {"x": 800, "y": 420},
+  "basket": {"x": 800, "y": 855, "style": "jar"},
+  "lumi": {"home": {"x": 800, "y": 200}},
+  "decor": [
+    {"type": "pine", "x": 150, "y": 600, "scale": 0.95, "color": "#2e5d3a", "snow": true},
+    {"type": "pine", "x": 330, "y": 570, "scale": 0.6, "color": "#2e5d3a", "snow": true},
+    {"type": "pine", "x": 1290, "y": 570, "scale": 0.65, "color": "#2e5d3a", "snow": true},
+    {"type": "rock", "x": 520, "y": 820, "color": "#90a4ae"},
+    {"type": "rock", "x": 1120, "y": 830, "color": "#90a4ae", "scale": 0.8}
+  ],
+  "turns": [
+    {
+      "player": "elea",
+      "type": "find_objects",
+      "object_kind": "star",
+      "prompt": {
+        "elea": "Elea, à toi ! Attrape 2 étoiles et mets-les dans le bocal.",
+        "isao": "Isao, à toi ! Attrape 2 étoiles et mets-les dans le bocal."
+      },
+      "success_line": "Bravo ! Deux étoiles dans le bocal !",
+      "need": 2,
+      "count_aloud": true,
+      "collect": "basket",
+      "hide_after": true,
+      "targets": [
+        {"id": "star_1", "x": 290, "y": 400, "color": "#ffd54f"},
+        {"id": "star_2", "x": 520, "y": 300, "color": "#ffd54f"},
+        {"id": "star_3", "x": 800, "y": 470, "color": "#ffd54f"},
+        {"id": "star_4", "x": 1080, "y": 310, "color": "#ffd54f"},
+        {"id": "star_5", "x": 1300, "y": 420, "color": "#ffd54f"}
+      ],
+      "distractors": []
+    },
+    {
+      "player": "isao",
+      "type": "choose_number",
+      "prompt": {
+        "elea": "Elea, à toi ! Combien d'oiseaux volent dans le ciel ?",
+        "isao": "Isao, à toi ! Combien d'oiseaux volent dans le ciel ?"
+      },
+      "answer_from": "count_items",
+      "count_items": [
+        {"kind": "bird", "x": 330, "y": 280, "color": "#fff"},
+        {"kind": "bird", "x": 570, "y": 200, "color": "#ffab91"},
+        {"kind": "bird", "x": 1040, "y": 220, "color": "#fff"},
+        {"kind": "bird", "x": 1270, "y": 300, "color": "#ffab91"}
+      ],
+      "choices": [3, 4, 5],
+      "layout": {"y": 520, "spacing": 330},
+      "success_line": "Oui ! Quatre oiseaux !",
+      "retry_line": "Compte avec moi…"
+    }
+  ],
+  "ambient_hotspots": [
+    {"id": "cloud_1", "x": 270, "y": 110, "reaction": "puff"},
+    {"id": "cloud_2", "x": 1150, "y": 100, "reaction": "puff", "scale": 0.85},
+    {"id": "snowman", "x": 1430, "y": 640, "reaction": "wobble"},
+    {"id": "flower", "x": 240, "y": 680, "reaction": "bloom", "color": "#e1f5fe"}
+  ],
+  "lines": {
+    "intro": "Nous voici en haut de la montagne, tout près du ciel ! La dernière gemme, la bleue, est ici.",
+    "celebration": "Bravo Isao et Elea ! Vous avez trouvé la gemme bleue ! Vous avez les cinq gemmes !"
+  }
+}

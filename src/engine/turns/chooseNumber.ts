@@ -1,3 +1,4 @@
+import { drawItem, highlightBody, type ItemShape } from '../../render/items';
 import { drawSign, SIGN_H, SIGN_W, type SignShape } from '../../render/signs';
 import { animate } from '../../render/svg';
 import type { ChooseNumberTurnDef, TurnDefBase } from '../../types';
@@ -20,10 +21,13 @@ export function createChooseNumber(ctx: TurnContext, raw: TurnDefBase): Turn {
   let counting = false;
   let countToken = 0;
   let finish: (() => void) | null = null;
+  /** Les objets qu'on compte (et que Lumi fait briller un par un). */
+  let counted: ItemShape[] = [];
 
   function resolveAnswer(): number {
+    if (def.answer_from === 'count_items') return counted.length;
     if (def.answer_from === 'previous_turn_count' && ctx.memory.previousTurnCount != null) return ctx.memory.previousTurnCount;
-    return def.answer ?? ctx.basket.count;
+    return def.answer ?? counted.length;
   }
 
   function choices(): number[] {
@@ -45,7 +49,7 @@ export function createChooseNumber(ctx: TurnContext, raw: TurnDefBase): Turn {
       sign.shape.body.classList.add('glow');
       void animate(sign.shape.body, [{ transform: 'scale(1)' }, { transform: 'scale(1.2) translateY(-20px)' }, { transform: 'scale(1.1)' }], { duration: 500, fill: 'forwards', easing: 'ease-out' });
       signs.filter((s) => s !== sign).forEach((s) => void animate(s.shape.root, [{ opacity: 1 }, { opacity: 0.25 }], { duration: 400, fill: 'forwards' }));
-      ctx.basket.highlightAll();
+      counted.forEach((c, i) => window.setTimeout(() => highlightBody(c.body), i * 120));
       await ctx.say(ctx.text(def.success_line));
       await Promise.all(signs.map((s) => animate(s.shape.root, [{ opacity: getComputedStyle(s.shape.root).opacity }, { opacity: 0 }], { duration: 500, fill: 'forwards' })));
       signs.forEach((s) => s.shape.root.remove());
@@ -65,9 +69,9 @@ export function createChooseNumber(ctx: TurnContext, raw: TurnDefBase): Turn {
     counting = true;
     const token = ++countToken;
     await ctx.say(ctx.text(def.retry_line));
-    for (let i = 0; i < ctx.basket.count; i++) {
+    for (let i = 0; i < counted.length; i++) {
       if (token !== countToken) break;
-      ctx.basket.highlight(i);
+      highlightBody(counted[i].body);
       await ctx.say(ctx.scene.lines.count[i] ?? String(i + 1));
     }
     counting = false;
@@ -75,13 +79,22 @@ export function createChooseNumber(ctx: TurnContext, raw: TurnDefBase): Turn {
 
   return {
     run() {
+      if (def.answer_from === 'count_items') {
+        counted = (def.count_items ?? []).map((d, i) => {
+          const it = drawItem(ctx.layers.objects, d, 'bird');
+          void animate(it.body, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 400, delay: i * 120, easing: 'ease-out', fill: 'backwards' });
+          return it;
+        });
+      } else {
+        counted = ctx.memory.collected ?? [];
+      }
       answer = resolveAnswer();
       const values = choices();
       const layout = def.layout ?? { y: 440, spacing: 330 };
       signs = values.map((value, i) => {
         const x = 800 + (i - (values.length - 1) / 2) * layout.spacing;
         const shape = drawSign(ctx.layers.signs, value, x, layout.y);
-        const sign: Sign = { value, x, y: layout.y, shape, hitId: `sign_${i}` };
+        const sign: Sign = { value, x, y: layout.y, shape, hitId: `sign_${ctx.turnIndex}_${i}` };
         ctx.input.add({ id: sign.hitId, cx: x, cy: layout.y, w: SIGN_W, h: SIGN_H, enabled: true, onDown: () => void onTap(sign) });
         void animate(shape.body, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1, offset: 0.7 }, { transform: 'scale(1)', opacity: 1 }], {
           duration: 500, delay: i * 150, easing: 'ease-out', fill: 'backwards',

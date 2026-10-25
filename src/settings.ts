@@ -5,6 +5,8 @@ export interface Prefs {
   first_player: string;
   voice_volume: number;
   voice_rate: number;
+  /** Tableau où reprendre (0 = premier ; égal au nombre de scènes = la Porte). */
+  board: number;
 }
 
 const KEY = 'isao-elea.prefs.v1';
@@ -22,6 +24,7 @@ export function loadPrefs(settings: GameSettings): Prefs {
     first_player: settings.first_player,
     voice_volume: settings.voice.volume,
     voice_rate: settings.voice.rate,
+    board: 0,
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -32,6 +35,7 @@ export function loadPrefs(settings: GameSettings): Prefs {
       }
       if (typeof saved.voice_volume === 'number') prefs.voice_volume = saved.voice_volume;
       if (typeof saved.voice_rate === 'number') prefs.voice_rate = saved.voice_rate;
+      if (typeof saved.board === 'number' && Number.isInteger(saved.board) && saved.board >= 0) prefs.board = saved.board;
     }
   } catch {
     // stockage indisponible (navigation privée...) : on garde les valeurs par défaut

@@ -1,4 +1,5 @@
 import type { Basket } from '../../render/basket';
+import type { ItemShape } from '../../render/items';
 import type { Layers } from '../../render/stage';
 import type { GameSettings, PlayerId, Point, SceneDef, TextByPlayer, TurnDefBase } from '../../types';
 import type { Clock } from '../clock';
@@ -9,13 +10,16 @@ import type { SayOptions, Voice } from '../voice';
 /** Ce qu'un tour reçoit du moteur. */
 export interface TurnContext {
   player: PlayerId;
+  /** Rang du tour dans la scène (sert à nommer les zones tactiles). */
+  turnIndex: number;
   scene: SceneDef;
   settings: GameSettings;
   layers: Layers;
   input: Input;
   sfx: Sfx;
   voice: Voice;
-  basket: Basket;
+  /** Panier de la scène, s'il y en a un. */
+  basket: Basket | null;
   clock: Clock;
   /** Résout un texte « par joueur » pour le joueur de ce tour. */
   text(t: TextByPlayer): string;
@@ -24,7 +28,7 @@ export interface TurnContext {
   /** Signale une action réussie : remet l'aide progressive à zéro. */
   progress(): void;
   /** Mémoire partagée entre les tours d'un tableau. */
-  memory: { previousTurnCount?: number };
+  memory: { previousTurnCount?: number; collected?: ItemShape[] };
 }
 
 /** Bonne cible désignée par l'aide (centre + haut du dessin, pour que Lumi s'y pose). */
