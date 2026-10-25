@@ -1,0 +1,78 @@
+{
+  "_meta": {"version": "0.1", "description": "La forge"},
+  "id": "forge",
+  "reward": "horseshoes",
+  "generator": "forge",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 1100, "y": 170}},
+  "view": {
+    "backdrop": "forge",
+    "decor": [{"type": "tools", "x": 560, "y": 150}, {"type": "shelf", "x": 720, "y": 440, "width": 680}]
+  },
+  "items": [
+    {"id": "smith", "kind": "npc", "npc": "smith", "x": 210, "y": 880},
+    {"id": "fire", "kind": "forge_fire", "x": 1310, "y": 660, "color": "#ff7043"},
+    {"id": "bellows", "kind": "bellows", "x": 1040, "y": 640, "scale": 0.9},
+    {"id": "crate", "kind": "crate", "x": 500, "y": 880, "scale": 0.8},
+    {"id": "anvil", "kind": "anvil", "x": 800, "y": 860},
+    {"id": "hammer", "kind": "hammer", "x": 960, "y": 860, "scale": 0.95}
+  ],
+  "ambient_hotspots": [{"id": "bat", "x": 1450, "y": 170, "reaction": "flap"}],
+  "config": {
+    "npc_pitch": 0.65,
+    "tap_min": 3,
+    "tap_max": 5,
+    "anvil_area": {"x": 820, "y": 770, "w": 380, "h": 220},
+    "shoe": {"x": 780, "y": 728},
+    "shoe_colors": [{"color": "#ffca28", "name": "doré"}, {"color": "#cfd8dc", "name": "argenté"}],
+    "nail_min": 2,
+    "nail_max": 4,
+    "nail_colors": [
+      {"id": "gold", "color": "#ffca28", "name": "dorés"},
+      {"id": "silver", "color": "#cfd8dc", "name": "argentés"},
+      {"id": "blue", "color": "#42a5f5", "name": "bleus"}
+    ],
+    "nail_spots": [
+      {"x": 440, "y": 440},
+      {"x": 510, "y": 440},
+      {"x": 580, "y": 440},
+      {"x": 650, "y": 440},
+      {"x": 720, "y": 440},
+      {"x": 790, "y": 440},
+      {"x": 860, "y": 440},
+      {"x": 930, "y": 440},
+      {"x": 1000, "y": 440}
+    ],
+    "crate": {"x": 500, "y": 880},
+    "count_words": ["Un !", "Deux !", "Trois !", "Quatre !", "Cinq !", "Six !", "Sept !", "Huit !", "Neuf !", "Dix !"],
+    "lines": {
+      "hammer": "{name}, prends le marteau et tape {n} fois sur l'enclume !",
+      "hammer_done": "Et voilà un fer à cheval {shoe} !",
+      "nails": "{name}, il faut {n} clous {color} pour le fer à cheval. Mets-les dans la caisse !",
+      "nails_retry": "Cherche les clous {color}.",
+      "nails_done": "Bravo {name} ! {n} clous !",
+      "outro": "Merci les enfants ! Voici des fers à cheval magiques pour vos licornes. Elles iront encore plus vite !",
+      "outro_again": "Merci encore ! De nouveaux fers à cheval tout brillants pour vos licornes !"
+    }
+  },
+  "steps": [
+    {
+      "type": "say",
+      "pitch": 0.65,
+      "text": "Bonjour ! Je suis le forgeron. Je fabrique des fers à cheval pour vos licornes. Vous m'aidez ?"
+    },
+    {
+      "type": "two_touch",
+      "prompt": "D'abord, il faut un grand feu. Appuyez sur le soufflet tous les deux !",
+      "area": {"x": 1080, "y": 600, "w": 300, "h": 200},
+      "effect": {"target": "fire", "color": "#ffeb3b"},
+      "success_line": "Fouuu ! Le feu est tout chaud !"
+    },
+    {"type": "slot", "name": "hammer"},
+    {"type": "slot", "name": "nails"},
+    {"type": "slot", "name": "outro"},
+    {"type": "reward", "from": {"x": 800, "y": 480}}
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour retourner au village !"}
+}

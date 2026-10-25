@@ -277,6 +277,31 @@ export type StepDef =
       effect?: { target: string; color: string };
       success_line?: TextByPlayer;
     }
+  | {
+      type: 'collect';
+      player: StepPlayer;
+      prompt: TextByPlayer;
+      /** Objets acceptés ; il faut en prendre `count` (un par emplacement de `dests`). */
+      accept: string[];
+      count: number;
+      dests: Dest[];
+      count_words?: string[];
+      success_line?: TextByPlayer;
+      retry_line?: TextByPlayer;
+    }
+  | {
+      type: 'tap_count';
+      player: StepPlayer;
+      prompt: TextByPlayer;
+      area: { x: number; y: number; w: number; h: number };
+      count: number;
+      /** Objet qui s'anime à chaque coup (ex. le marteau). */
+      tool?: string;
+      count_words?: string[];
+      success_line?: TextByPlayer;
+      /** Objets qui apparaissent à la fin (ex. le fer à cheval terminé). */
+      then_show?: string[];
+    }
   | { type: 'parts'; parts: Record<PlayerId, StepDef[]> }
   | { type: 'reward'; from: Point };
 
@@ -293,4 +318,7 @@ export interface PlaceDef {
   lumi: { home: Point };
   ambient_hotspots?: AmbientDef[];
   lines: { done: string };
+  /** Contenu tiré au hasard à chaque visite (voir engine/places/generators.ts). */
+  generator?: string;
+  config?: Record<string, unknown>;
 }

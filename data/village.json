@@ -1,5 +1,5 @@
 {
-  "_meta": {"version": "0.1", "description": "Le village (après la Porte)"},
+  "_meta": {"version": "0.2", "description": "Le village (après la Porte)"},
   "id": "village_1",
   "view": {
     "backdrop": "village",
@@ -55,7 +55,8 @@
       "wall": "#fff8e1",
       "sign": "bread",
       "scale": 0.85,
-      "line": "C'est la boulangerie. Elle est fermée pour l'instant."
+      "place": "place_bakery.json",
+      "line": "La boulangerie ! Ça sent bon ! On entre !"
     },
     {
       "id": "forge",
@@ -65,10 +66,11 @@
       "wall": "#eceff1",
       "sign": "hammer",
       "scale": 0.85,
-      "line": "C'est la forge. Elle est fermée pour l'instant."
+      "place": "place_forge.json",
+      "line": "La forge du forgeron ! On entre !"
     }
   ],
-  "bag": [{"id": "unicorns"}, {"id": "potion"}, {"id": "grimoire"}],
+  "bag": [{"id": "unicorns"}, {"id": "potion"}, {"id": "grimoire"}, {"id": "cake"}, {"id": "horseshoes"}],
   "ambient_hotspots": [
     {"id": "butterfly", "x": 560, "y": 300, "reaction": "flutter", "color": "#ffca28"},
     {"id": "bird", "x": 1060, "y": 290, "reaction": "fly_away_and_back"},
@@ -82,6 +84,6 @@
     "intro": "Vous avez passé la porte du pays de l'imaginaire ! Voici le village. Les habitants ont besoin de vous.",
     "prompt": "Touchez une maison pour la visiter !",
     "closed": "Cette maison est fermée pour l'instant.",
-    "all_done": "Bravo ! Vous avez aidé l'écurie, l'apothicaire et le libraire. Les autres maisons s'ouvriront bientôt !"
+    "all_done": "Bravo ! Vous avez aidé tout le village ! Vous pouvez retourner dans les maisons : ce sera un peu différent à chaque fois."
   }
 }

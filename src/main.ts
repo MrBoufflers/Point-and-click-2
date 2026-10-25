@@ -1,6 +1,7 @@
 import './style.css';
 import { FinaleRunner } from './engine/finale';
 import { VillageHub } from './engine/places/hub';
+import { buildPlace } from './engine/places/generators';
 import { PlaceRunner } from './engine/places/placeRunner';
 import type { RewardLook } from './render/bag';
 import { SceneRunner } from './engine/sceneRunner';
@@ -140,8 +141,17 @@ async function boot(): Promise<void> {
   };
 
   const startPlace = (house: HouseDef) => {
-    const def = house.place ? game.places.get(house.place) : undefined;
-    if (!def) return;
+    const raw = house.place ? game.places.get(house.place) : undefined;
+    if (!raw) return;
+    // Nouveau tirage à chaque visite (jamais le même que la dernière fois).
+    const built = buildPlace(raw, {
+      players: settings.players,
+      memory: prefs.village.memory[raw.id] ?? [],
+      again: prefs.village.done.includes(house.id),
+    });
+    prefs.village.memory[raw.id] = built.memory;
+    savePrefs(prefs);
+    const def = built.place;
     resetScreen();
     runner = new PlaceRunner({
       ...villageCommon(), place: def,
@@ -253,7 +263,7 @@ async function boot(): Promise<void> {
     },
     resetAll: () => {
       $('start').hidden = true;
-      prefs.village = { done: [], unicorns: {} };
+      prefs.village = { done: [], unicorns: {}, memory: {} };
       villageVisited = false;
       startBoard(0);
     },

@@ -8,7 +8,7 @@ export interface Prefs {
   /** Tableau où reprendre (0 = premier ; égal au nombre de scènes = la Porte). */
   board: number;
   /** Village : maisons terminées et couleur des licornes de chaque enfant. */
-  village: { done: string[]; unicorns: Record<string, string> };
+  village: { done: string[]; unicorns: Record<string, string>; memory: Record<string, string[]> };
 }
 
 const KEY = 'isao-elea.prefs.v1';
@@ -27,7 +27,7 @@ export function loadPrefs(settings: GameSettings): Prefs {
     voice_volume: settings.voice.volume,
     voice_rate: settings.voice.rate,
     board: 0,
-    village: { done: [], unicorns: {} },
+    village: { done: [], unicorns: {}, memory: {} },
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -44,6 +44,9 @@ export function loadPrefs(settings: GameSettings): Prefs {
         if (Array.isArray(v.done)) prefs.village.done = v.done.filter((x): x is string => typeof x === 'string');
         if (v.unicorns && typeof v.unicorns === 'object') {
           for (const [k, c] of Object.entries(v.unicorns)) if (typeof c === 'string') prefs.village.unicorns[k] = c;
+        }
+        if (v.memory && typeof v.memory === 'object') {
+          for (const [k, m] of Object.entries(v.memory)) if (Array.isArray(m)) prefs.village.memory[k] = m.filter((x): x is string => typeof x === 'string');
         }
       }
     }

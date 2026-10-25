@@ -1,7 +1,8 @@
 {
-  "_meta": {"version": "0.1", "description": "L'écurie des licornes"},
+  "_meta": {"version": "0.2", "description": "L'écurie des licornes"},
   "id": "stable",
   "reward": "unicorns",
+  "generator": "stable",
   "hint_delays_s": [8, 15, 25],
   "auto_solve_after_s": 35,
   "lumi": {"home": {"x": 800, "y": 200}},
@@ -11,10 +12,10 @@
       {"type": "window", "x": 420, "y": 380},
       {"type": "window", "x": 1180, "y": 380},
       {"type": "lantern", "x": 800, "y": 160},
-      {"type": "stall", "x": 150, "y": 640},
-      {"type": "stall", "x": 1450, "y": 640},
       {"type": "hay", "x": 270, "y": 720},
-      {"type": "hay", "x": 1340, "y": 730}
+      {"type": "hay", "x": 1340, "y": 730},
+      {"type": "stall", "x": 150, "y": 640},
+      {"type": "stall", "x": 1450, "y": 640}
     ]
   },
   "items": [
@@ -25,8 +26,233 @@
     {"id": "bird", "x": 1180, "y": 230, "reaction": "fly_away_and_back"},
     {"id": "snail", "x": 120, "y": 870, "reaction": "hide", "scale": 0.7}
   ],
+  "config": {
+    "pairs": [
+      {
+        "id": "bridge_stones",
+        "prompt": "{name}, par où on passe ? Le pont de bois, ou les pierres dans la rivière ?",
+        "options": [
+          {
+            "id": "bridge",
+            "card": [{"type": "water", "x": 0, "y": 75, "width": 330}, {"type": "bridge", "x": 0, "y": 75, "scale": 0.45}],
+            "line": "Clip clop, clip clop ! Vous traversez le pont de bois au-dessus de la rivière.",
+            "view": {
+              "backdrop": "river",
+              "decor": [{"type": "bridge", "x": 800, "y": 640, "scale": 1.3}, {"type": "reed", "x": 250, "y": 712}]
+            }
+          },
+          {
+            "id": "stones",
+            "card": [{"type": "water", "x": 0, "y": 75, "width": 330}, {"type": "stepping", "x": 0, "y": 75, "scale": 0.6}],
+            "line": "Hop, hop, hop ! Les licornes sautent de pierre en pierre !",
+            "view": {
+              "backdrop": "river",
+              "decor": [{"type": "stepping", "x": 800, "y": 645, "scale": 1.4}, {"type": "reed", "x": 1350, "y": 712}]
+            }
+          }
+        ]
+      },
+      {
+        "id": "rainbow_waterfall",
+        "prompt": "{name}, à toi de choisir ! L'arc-en-ciel, ou la cascade ?",
+        "options": [
+          {
+            "id": "rainbow",
+            "card": [{"type": "rainbow", "x": 0, "y": 70, "scale": 0.45}],
+            "line": "Oh ! Un grand arc-en-ciel ! Les licornes galopent dessous.",
+            "view": {
+              "backdrop": "meadow",
+              "decor": [{"type": "rainbow", "x": 800, "y": 560, "scale": 1.8}, {"type": "flowers", "x": 300, "y": 650}]
+            }
+          },
+          {
+            "id": "waterfall",
+            "card": [{"type": "waterfall", "x": 0, "y": 100, "scale": 0.55}],
+            "line": "Splash ! Une cascade toute fraîche. Les licornes boivent un peu d'eau.",
+            "view": {
+              "backdrop": "mountain",
+              "decor": [
+                {"type": "waterfall", "x": 1150, "y": 600, "scale": 1.2},
+                {"type": "pine", "x": 300, "y": 600, "snow": true, "color": "#2e5d3a"}
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "forest_flowers",
+        "prompt": "{name}, quel chemin ? La forêt, ou le champ de fleurs ?",
+        "options": [
+          {
+            "id": "forest",
+            "card": [{"type": "pine", "x": -70, "y": 100, "scale": 0.45}, {"type": "pine", "x": 60, "y": 110, "scale": 0.55}],
+            "line": "La forêt enchantée ! Les oiseaux chantent pour vos licornes.",
+            "view": {
+              "backdrop": "forest",
+              "decor": [
+                {"type": "tree", "x": 200, "y": 560},
+                {"type": "tree", "x": 1400, "y": 560},
+                {"type": "pine", "x": 800, "y": 480, "scale": 0.8}
+              ]
+            }
+          },
+          {
+            "id": "flowers",
+            "card": [
+              {"type": "sun", "x": 100, "y": -60, "scale": 0.45},
+              {"type": "flowers", "x": -70, "y": 95, "scale": 1.3},
+              {"type": "flowers", "x": 60, "y": 105, "scale": 1.3}
+            ],
+            "line": "Un champ de fleurs ! Hum, ça sent bon !",
+            "view": {
+              "backdrop": "meadow",
+              "decor": [
+                {"type": "flowers", "x": 200, "y": 620, "scale": 1.5},
+                {"type": "flowers", "x": 450, "y": 580, "scale": 1.5},
+                {"type": "flowers", "x": 700, "y": 640, "scale": 1.5},
+                {"type": "flowers", "x": 950, "y": 590, "scale": 1.5},
+                {"type": "flowers", "x": 1200, "y": 630, "scale": 1.5},
+                {"type": "flowers", "x": 1420, "y": 590, "scale": 1.5}
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "cave_mountain",
+        "prompt": "{name}, à toi ! La grotte aux cristaux, ou le haut de la montagne ?",
+        "options": [
+          {
+            "id": "cave",
+            "card": [{"type": "cave_mouth", "x": 0, "y": 120, "scale": 0.5}],
+            "line": "La grotte aux cristaux ! Tout brille autour de vous.",
+            "view": {
+              "backdrop": "cave",
+              "decor": [
+                {"type": "crystal", "x": 300, "y": 600, "color": "#4dd0e1"},
+                {"type": "crystal", "x": 1300, "y": 600, "color": "#fdd835"}
+              ]
+            }
+          },
+          {
+            "id": "mountain",
+            "card": [{"type": "mountain_peak", "x": 0, "y": 120, "scale": 0.5}],
+            "line": "Tout en haut de la montagne ! On voit tout le pays de l'imaginaire !",
+            "view": {
+              "backdrop": "mountain",
+              "decor": [{"type": "cloud", "x": 400, "y": 200}, {"type": "cloud", "x": 1200, "y": 160}]
+            }
+          }
+        ]
+      },
+      {
+        "id": "lake_hill",
+        "prompt": "{name}, par où ? Le grand lac, ou la colline au soleil ?",
+        "options": [
+          {
+            "id": "lake",
+            "card": [{"type": "water", "x": 0, "y": 70, "width": 300}, {"type": "reed", "x": -110, "y": 100, "scale": 0.4}],
+            "line": "Le grand lac ! Les licornes se regardent dans l'eau comme dans un miroir.",
+            "view": {
+              "backdrop": "meadow",
+              "decor": [
+                {"type": "water", "x": 800, "y": 640, "width": 1100, "scale": 1.3},
+                {"type": "reed", "x": 300, "y": 660},
+                {"type": "reed", "x": 1300, "y": 660}
+              ]
+            }
+          },
+          {
+            "id": "hill",
+            "card": [{"type": "sun", "x": 0, "y": -30, "scale": 0.6}, {"type": "bush", "x": 0, "y": 120, "scale": 0.6}],
+            "line": "La colline au soleil ! Il fait tout chaud, les licornes s'étirent.",
+            "view": {
+              "backdrop": "meadow",
+              "decor": [
+                {"type": "sun", "x": 1150, "y": 220, "scale": 1.4},
+                {"type": "bush", "x": 400, "y": 600},
+                {"type": "flowers", "x": 1000, "y": 640}
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "snow_rocks",
+        "prompt": "{name}, choisis ! La neige, ou les gros rochers ?",
+        "options": [
+          {
+            "id": "snow",
+            "card": [
+              {"type": "pine", "x": 0, "y": 110, "scale": 0.5, "snow": true, "color": "#2e5d3a"},
+              {"type": "cloud", "x": 0, "y": -70, "scale": 0.5}
+            ],
+            "line": "Brrr, de la neige ! Les licornes laissent des traces toutes rondes.",
+            "view": {
+              "backdrop": "mountain",
+              "decor": [
+                {"type": "pine", "x": 250, "y": 620, "snow": true, "color": "#2e5d3a"},
+                {"type": "pine", "x": 1350, "y": 620, "snow": true, "color": "#2e5d3a"}
+              ]
+            }
+          },
+          {
+            "id": "rocks",
+            "card": [
+              {"type": "rock", "x": -60, "y": 90},
+              {"type": "rock", "x": 60, "y": 100, "scale": 0.8},
+              {"type": "rock", "x": 0, "y": 60, "scale": 0.6}
+            ],
+            "line": "Les gros rochers ! Les licornes sautent par-dessus, hop !",
+            "view": {
+              "backdrop": "river",
+              "decor": [{"type": "rock", "x": 400, "y": 540, "scale": 2}, {"type": "rock", "x": 1200, "y": 540, "scale": 2.4}]
+            }
+          }
+        ]
+      },
+      {
+        "id": "bushes_crystals",
+        "prompt": "{name}, dernier chemin ! Les buissons fleuris, ou les cristaux brillants ?",
+        "options": [
+          {
+            "id": "bushes",
+            "card": [
+              {"type": "bush", "x": -60, "y": 100, "scale": 0.5},
+              {"type": "bush", "x": 60, "y": 110, "scale": 0.5},
+              {"type": "flowers", "x": 0, "y": 115}
+            ],
+            "line": "Les buissons fleuris ! Un petit lapin se cache dedans, chut !",
+            "view": {
+              "backdrop": "forest",
+              "decor": [
+                {"type": "bush", "x": 300, "y": 600},
+                {"type": "bush", "x": 1300, "y": 600},
+                {"type": "flowers", "x": 800, "y": 620, "scale": 1.6}
+              ]
+            }
+          },
+          {
+            "id": "crystals",
+            "card": [
+              {"type": "crystal", "x": -50, "y": 110, "scale": 0.5, "color": "#b388ff"},
+              {"type": "crystal", "x": 55, "y": 110, "scale": 0.6, "color": "#4dd0e1"}
+            ],
+            "line": "Les cristaux brillants ! Ils font de la lumière de toutes les couleurs.",
+            "view": {
+              "backdrop": "cave",
+              "decor": [
+                {"type": "crystal", "x": 400, "y": 600, "color": "#b388ff", "scale": 1.3},
+                {"type": "crystal", "x": 1200, "y": 600, "color": "#4dd0e1", "scale": 1.3}
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
   "steps": [
-    {"type": "say", "text": "Bienvenue à l'écurie ! Ces deux licornes attendent leurs nouveaux amis."},
+    {"type": "say", "text": "Bienvenue à l'écurie ! Les licornes attendent leurs amis."},
     {
       "type": "choose_color",
       "player": "first",
@@ -70,139 +296,7 @@
         ]
       }
     },
-    {
-      "type": "fork",
-      "player": "first",
-      "prompt": {
-        "elea": "Elea, par où on passe ? Le pont de bois, ou les pierres dans la rivière ?",
-        "isao": "Isao, par où on passe ? Le pont de bois, ou les pierres dans la rivière ?"
-      },
-      "options": [
-        {
-          "id": "bridge",
-          "card": [{"type": "water", "x": 0, "y": 75, "width": 330}, {"type": "bridge", "x": 0, "y": 75, "scale": 0.45}],
-          "line": "Clip clop, clip clop ! Vous traversez le pont de bois au-dessus de la rivière.",
-          "view": {
-            "backdrop": "river",
-            "decor": [{"type": "bridge", "x": 800, "y": 640, "scale": 1.3}, {"type": "reed", "x": 250, "y": 712}]
-          }
-        },
-        {
-          "id": "stones",
-          "card": [{"type": "water", "x": 0, "y": 75, "width": 330}, {"type": "stepping", "x": 0, "y": 75, "scale": 0.6}],
-          "line": "Hop, hop, hop ! Les licornes sautent de pierre en pierre !",
-          "view": {
-            "backdrop": "river",
-            "decor": [{"type": "stepping", "x": 800, "y": 645, "scale": 1.4}, {"type": "reed", "x": 1350, "y": 712}]
-          }
-        }
-      ]
-    },
-    {
-      "type": "fork",
-      "player": "second",
-      "prompt": {
-        "elea": "Elea, à toi de choisir ! L'arc-en-ciel, ou la cascade ?",
-        "isao": "Isao, à toi de choisir ! L'arc-en-ciel, ou la cascade ?"
-      },
-      "options": [
-        {
-          "id": "rainbow",
-          "card": [{"type": "rainbow", "x": 0, "y": 70, "scale": 0.45}],
-          "line": "Oh ! Un grand arc-en-ciel ! Les licornes galopent dessous.",
-          "view": {
-            "backdrop": "meadow",
-            "decor": [{"type": "rainbow", "x": 800, "y": 560, "scale": 1.8}, {"type": "flowers", "x": 300, "y": 650}]
-          }
-        },
-        {
-          "id": "waterfall",
-          "card": [{"type": "waterfall", "x": 0, "y": 100, "scale": 0.55}],
-          "line": "Splash ! Une cascade toute fraîche. Les licornes boivent un peu d'eau.",
-          "view": {
-            "backdrop": "mountain",
-            "decor": [
-              {"type": "waterfall", "x": 1150, "y": 600, "scale": 1.2},
-              {"type": "pine", "x": 300, "y": 600, "snow": true, "color": "#2e5d3a"}
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "type": "fork",
-      "player": "first",
-      "prompt": {
-        "elea": "Elea, encore un chemin ! La forêt, ou le champ de fleurs ?",
-        "isao": "Isao, encore un chemin ! La forêt, ou le champ de fleurs ?"
-      },
-      "options": [
-        {
-          "id": "forest",
-          "card": [{"type": "pine", "x": -70, "y": 100, "scale": 0.45}, {"type": "pine", "x": 60, "y": 110, "scale": 0.55}],
-          "line": "La forêt enchantée ! Les oiseaux chantent pour vos licornes.",
-          "view": {
-            "backdrop": "forest",
-            "decor": [
-              {"type": "tree", "x": 200, "y": 560},
-              {"type": "tree", "x": 1400, "y": 560},
-              {"type": "pine", "x": 800, "y": 480, "scale": 0.8}
-            ]
-          }
-        },
-        {
-          "id": "flowers",
-          "card": [
-            {"type": "sun", "x": 100, "y": -60, "scale": 0.45},
-            {"type": "flowers", "x": -70, "y": 95, "scale": 1.3},
-            {"type": "flowers", "x": 60, "y": 105, "scale": 1.3}
-          ],
-          "line": "Un champ de fleurs ! Hum, ça sent bon !",
-          "view": {
-            "backdrop": "meadow",
-            "decor": [
-              {"type": "flowers", "x": 200, "y": 620, "scale": 1.5},
-              {"type": "flowers", "x": 450, "y": 580, "scale": 1.5},
-              {"type": "flowers", "x": 700, "y": 640, "scale": 1.5},
-              {"type": "flowers", "x": 950, "y": 590, "scale": 1.5},
-              {"type": "flowers", "x": 1200, "y": 630, "scale": 1.5},
-              {"type": "flowers", "x": 1420, "y": 590, "scale": 1.5}
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "type": "fork",
-      "player": "second",
-      "prompt": {
-        "elea": "Elea, dernier choix ! La grotte aux cristaux, ou le haut de la montagne ?",
-        "isao": "Isao, dernier choix ! La grotte aux cristaux, ou le haut de la montagne ?"
-      },
-      "options": [
-        {
-          "id": "cave",
-          "card": [{"type": "cave_mouth", "x": 0, "y": 120, "scale": 0.5}],
-          "line": "La grotte aux cristaux ! Tout brille autour de vous.",
-          "view": {
-            "backdrop": "cave",
-            "decor": [
-              {"type": "crystal", "x": 300, "y": 600, "color": "#4dd0e1"},
-              {"type": "crystal", "x": 1300, "y": 600, "color": "#fdd835"}
-            ]
-          }
-        },
-        {
-          "id": "mountain",
-          "card": [{"type": "mountain_peak", "x": 0, "y": 120, "scale": 0.5}],
-          "line": "Tout en haut de la montagne ! On voit tout le pays de l'imaginaire !",
-          "view": {
-            "backdrop": "mountain",
-            "decor": [{"type": "cloud", "x": 400, "y": 200}, {"type": "cloud", "x": 1200, "y": 160}]
-          }
-        }
-      ]
-    },
+    {"type": "slot", "name": "forks"},
     {"type": "say", "text": "Il est temps de rentrer à l'écurie."},
     {
       "type": "view",
@@ -218,10 +312,7 @@
         ]
       }
     },
-    {
-      "type": "say",
-      "text": "Quelle belle promenade ! Ces licornes sont maintenant à vous. Elles vous suivront partout !"
-    },
+    {"type": "say", "text": "Quelle belle promenade ! Les licornes sont contentes. Elles vous suivront partout !"},
     {"type": "reward", "from": {"x": 800, "y": 420}}
   ],
   "lines": {"done": "Touchez la grosse flèche pour retourner au village !"}

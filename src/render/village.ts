@@ -396,3 +396,162 @@ export function drawSignIcon(g: SVGGElement, sign: string): void {
       el('circle', { r: 16, fill: '#bdbdbd' }, g);
   }
 }
+
+// ---------------- Boulangerie et forge ----------------
+
+BACKDROPS.bakery = {
+  colors: { sky_top: '#ffe0b2', sky_bottom: '#ffcc80', ground: '#d7ccc8' },
+  draw(bg, c) {
+    for (let x = 0; x < VIEW_W; x += 60) el('rect', { x, y: -400, width: 30, height: 1040, fill: '#ffd59a', opacity: 0.6 }, bg);
+    el('path', { d: `M-800 640 H ${VIEW_W + 800} V 1300 H -800 Z`, fill: c.ground }, bg);
+    for (let x = -800; x < VIEW_W + 800; x += 80) {
+      for (let y = 640; y < 960; y += 80) if (((x + y) / 80) % 2 === 0) el('rect', { x, y, width: 80, height: 80, fill: '#bcaaa4' }, bg);
+    }
+  },
+};
+
+BACKDROPS.forge = {
+  colors: { sky_top: '#3e2f2a', sky_bottom: '#5d4037', ground: '#4e403a' },
+  draw(bg, c) {
+    for (let y = 0; y < 640; y += 70) {
+      for (let x = (y / 70) % 2 ? -60 : 0; x < VIEW_W; x += 120) el('rect', { x: x + 4, y: y + 4, width: 112, height: 62, rx: 10, fill: '#5a4640' }, bg);
+    }
+    el('ellipse', { cx: 1150, cy: 520, rx: 420, ry: 260, fill: '#ff8a65', opacity: 0.12 }, bg);
+    el('path', { d: `M-800 640 H ${VIEW_W + 800} V 1300 H -800 Z`, fill: c.ground }, bg);
+  },
+};
+
+Object.assign(DECOR, {
+  oven(parent: SVGGElement, d: DecorDef) {
+    const g = g0(parent, d);
+    el('path', { d: 'M-170 0 V -220 Q 0 -360 170 -220 V 0 Z', fill: '#d84315', stroke: '#8d3a1a', 'stroke-width': 8 }, g);
+    for (let y = -40; y > -220; y -= 45) el('line', { x1: -170, y1: y, x2: 170, y2: y, stroke: '#bf360c', 'stroke-width': 4 }, g);
+    el('path', { d: 'M-80 -10 V -110 A 80 70 0 0 1 80 -110 V -10 Z', fill: '#3e2723' }, g);
+    el('path', { d: 'M-60 -10 Q 0 -90 60 -10 Z', fill: '#ff9800', class: 'flame' }, g);
+  },
+  tools(parent: SVGGElement, d: DecorDef) {
+    const g = g0(parent, d);
+    el('rect', { x: -150, y: -10, width: 300, height: 16, fill: '#6d4c41' }, g);
+    for (const [x, len] of [[-110, 120], [-40, 150], [30, 110], [100, 140]]) {
+      el('line', { x1: x, y1: 0, x2: x, y2: len, stroke: '#8d6e63', 'stroke-width': 10 }, g);
+      el('rect', { x: x - 18, y: len - 10, width: 36, height: 26, rx: 4, fill: '#78909c' }, g);
+    }
+  },
+  breads(parent: SVGGElement, d: DecorDef) {
+    const g = g0(parent, d);
+    for (const x of [-120, -40, 40, 120]) el('ellipse', { cx: x, cy: -22, rx: 36, ry: 22, fill: '#e0a050', stroke: '#a0632a', 'stroke-width': 4 }, g);
+  },
+});
+
+Object.assign(DRAWERS, {
+  cake(body: SVGGElement, d: ItemDef) {
+    const c = colorOf(d.color ?? '#f8bbd0');
+    el('ellipse', { cx: 0, cy: 0, rx: 230, ry: 30, fill: '#eceff1', stroke: '#b0bec5', 'stroke-width': 5 }, body);
+    el('rect', { x: -190, y: -150, width: 380, height: 150, rx: 20, fill: shade(c, -0.08), stroke: shade(c, -0.4), 'stroke-width': 6 }, body);
+    el('ellipse', { cx: 0, cy: -150, rx: 190, ry: 36, fill: c, stroke: shade(c, -0.4), 'stroke-width': 6 }, body);
+    el('path', { d: 'M-190 -140 Q -170 -100 -150 -135 Q -130 -100 -110 -135 Q -90 -100 -70 -135 Q -50 -100 -30 -135 Q -10 -100 10 -135 Q 30 -100 50 -135 Q 70 -100 90 -135 Q 110 -100 130 -135 Q 150 -100 170 -135 Q 180 -110 190 -140', fill: '#fff', opacity: 0.85 }, body);
+    return { w: 460, h: 190 };
+  },
+  strawberry(body: SVGGElement) {
+    el('path', { d: 'M0 0 Q -38 -40 -26 -62 Q 0 -74 26 -62 Q 38 -40 0 0 Z', fill: '#e53935', stroke: '#b71c1c', 'stroke-width': 4 }, body);
+    for (const [x, y] of [[-10, -40], [10, -30], [-4, -20], [12, -52], [-16, -54]]) el('circle', { cx: x, cy: y, r: 2.5, fill: '#ffeb3b' }, body);
+    el('path', { d: 'M-22 -64 L 0 -76 L 22 -64 L 8 -60 L 0 -70 L -8 -60 Z', fill: '#43a047' }, body);
+    return { w: 70, h: 78 };
+  },
+  cherry(body: SVGGElement) {
+    el('path', { d: 'M-14 -30 Q -6 -70 14 -84 M14 -30 Q 12 -60 14 -84', stroke: '#558b2f', 'stroke-width': 4, fill: 'none' }, body);
+    for (const x of [-14, 14]) {
+      el('circle', { cx: x, cy: -20, r: 20, fill: '#c62828', stroke: '#7f0000', 'stroke-width': 4 }, body);
+      el('circle', { cx: x - 6, cy: -26, r: 5, fill: '#fff', opacity: 0.6 }, body);
+    }
+    return { w: 76, h: 86 };
+  },
+  candle(body: SVGGElement, d: ItemDef) {
+    const c = colorOf(d.color ?? '#4fc3f7');
+    el('rect', { x: -10, y: -80, width: 20, height: 80, rx: 5, fill: c, stroke: shade(c, -0.4), 'stroke-width': 3 }, body);
+    for (const y of [-64, -40, -16]) el('line', { x1: -10, y1: y, x2: 10, y2: y - 8, stroke: '#fff', 'stroke-width': 4, opacity: 0.8 }, body);
+    el('line', { x1: 0, y1: -80, x2: 0, y2: -92, stroke: '#3e2723', 'stroke-width': 3 }, body);
+    return { w: 40, h: 92 };
+  },
+  flame(body: SVGGElement) {
+    const g = el('g', { class: 'flame' }, body);
+    el('path', { d: 'M0 0 Q -16 -18 0 -44 Q 16 -18 0 0 Z', fill: '#ffb300' }, g);
+    el('path', { d: 'M0 -4 Q -7 -14 0 -28 Q 7 -14 0 -4 Z', fill: '#fff59d' }, g);
+    el('circle', { cx: 0, cy: -20, r: 26, fill: '#ffe082', opacity: 0.35 }, g);
+    return { w: 40, h: 46 };
+  },
+  anvil(body: SVGGElement) {
+    el('path', { d: 'M-60 0 L -40 -50 H 40 L 60 0 Z', fill: '#455a64', stroke: '#263238', 'stroke-width': 5 }, body);
+    el('rect', { x: -26, y: -95, width: 52, height: 50, fill: '#546e7a', stroke: '#263238', 'stroke-width': 5 }, body);
+    el('path', { d: 'M-140 -95 Q -150 -125 -110 -130 H 120 V -95 Z', fill: '#607d8b', stroke: '#263238', 'stroke-width': 5 }, body);
+    el('line', { x1: -100, y1: -122, x2: 110, y2: -122, stroke: '#90a4ae', 'stroke-width': 4 }, body);
+    return { w: 280, h: 135 };
+  },
+  hammer(body: SVGGElement) {
+    // Pivot en bas du manche (pour l'animation de frappe)
+    el('rect', { x: -7, y: -150, width: 14, height: 150, rx: 6, fill: '#8d6e63', stroke: '#5d4037', 'stroke-width': 3 }, body);
+    el('rect', { x: -40, y: -180, width: 80, height: 40, rx: 6, fill: '#78909c', stroke: '#37474f', 'stroke-width': 4 }, body);
+    return { w: 90, h: 180 };
+  },
+  bellows(body: SVGGElement) {
+    el('path', { d: 'M-90 -20 L 60 -70 L 60 30 Z', fill: '#8d6e63', stroke: '#4e342e', 'stroke-width': 5 }, body);
+    for (const x of [-40, 0, 30]) el('line', { x1: x, y1: -20 - (x + 90) * 0.33, x2: x, y2: -20 + (x + 90) * 0.33, stroke: '#5d4037', 'stroke-width': 4 }, body);
+    el('rect', { x: 60, y: -36, width: 70, height: 32, rx: 6, fill: '#6d4c41', stroke: '#3e2723', 'stroke-width': 4 }, body);
+    el('rect', { x: -130, y: -30, width: 44, height: 18, rx: 4, fill: '#90a4ae' }, body);
+    return { w: 270, h: 110 };
+  },
+  forge_fire(body: SVGGElement, d: ItemDef) {
+    el('path', { d: 'M-180 0 V -120 H 180 V 0 Z', fill: '#6d4c41', stroke: '#3e2723', 'stroke-width': 8 }, body);
+    el('rect', { x: -150, y: -150, width: 300, height: 34, rx: 10, fill: '#3e2723' }, body);
+    const c = colorOf(d.color ?? '#ff7043');
+    for (const [x, h] of [[-90, 110], [-30, 160], [30, 140], [90, 100]]) {
+      el('path', { d: `M${x - 40} -140 Q ${x - 30} ${-140 - h * 0.7} ${x} ${-140 - h} Q ${x + 30} ${-140 - h * 0.7} ${x + 40} -140 Z`, fill: c, 'data-role': 'liquid', class: 'flame' }, body);
+    }
+    el('ellipse', { cx: 0, cy: -150, rx: 140, ry: 22, fill: '#ffcc80', opacity: 0.7 }, body);
+    return { w: 360, h: 300 };
+  },
+  nail(body: SVGGElement, d: ItemDef) {
+    const c = colorOf(d.color ?? '#ffca28');
+    el('rect', { x: -6, y: -70, width: 12, height: 62, fill: c, stroke: shade(c, -0.45), 'stroke-width': 3 }, body);
+    el('path', { d: 'M-6 -8 L 0 6 L 6 -8 Z', fill: c, stroke: shade(c, -0.45), 'stroke-width': 3 }, body);
+    el('rect', { x: -22, y: -82, width: 44, height: 14, rx: 6, fill: c, stroke: shade(c, -0.45), 'stroke-width': 3 }, body);
+    return { w: 50, h: 90 };
+  },
+  horseshoe(body: SVGGElement, d: ItemDef) {
+    const c = colorOf(d.color ?? '#b0bec5');
+    el('path', { d: 'M-50 0 V -55 A 50 50 0 0 1 50 -55 V 0 H 26 V -55 A 26 26 0 0 0 -26 -55 V 0 Z', fill: c, stroke: shade(c, -0.45), 'stroke-width': 5, 'stroke-linejoin': 'round' }, body);
+    for (const [x, y] of [[-38, -30], [38, -30], [-30, -80], [30, -80]]) el('circle', { cx: x, cy: y, r: 4, fill: shade(c, -0.5) }, body);
+    return { w: 110, h: 110 };
+  },
+  crate(body: SVGGElement) {
+    el('rect', { x: -110, y: -80, width: 220, height: 80, fill: '#a1887f', stroke: '#5d4037', 'stroke-width': 6 }, body);
+    el('line', { x1: -110, y1: -40, x2: 110, y2: -40, stroke: '#795548', 'stroke-width': 4 }, body);
+    return { w: 220, h: 80 };
+  },
+});
+
+/** Personnages ajoutés : boulanger et forgeron (les autres sont dans DRAWERS.npc). */
+const baseNpc = DRAWERS.npc;
+DRAWERS.npc = (body: SVGGElement, d: ItemDef) => {
+  if (d.npc === 'baker') {
+    el('path', { d: 'M-85 0 L -70 -220 Q 0 -245 70 -220 L 85 0 Z', fill: '#fafafa', stroke: '#bdbdbd', 'stroke-width': 5 }, body);
+    el('path', { d: 'M-55 -170 H 55 L 65 0 H -65 Z', fill: '#ffcc80', stroke: '#e0a050', 'stroke-width': 4 }, body);
+    el('circle', { cx: 0, cy: -265, r: 46, fill: SKIN, stroke: '#d7a28f', 'stroke-width': 3 }, body);
+    el('path', { d: 'M-30 -248 Q -15 -236 0 -246 Q 15 -236 30 -248', stroke: '#6d4c41', 'stroke-width': 8, fill: 'none', 'stroke-linecap': 'round' }, body);
+    for (const x of [-15, 15]) el('circle', { cx: x, cy: -275, r: 5, fill: '#263238' }, body);
+    el('path', { d: 'M-12 -232 Q 0 -222 12 -232', stroke: '#5d4037', 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' }, body);
+    for (const [cx, cy, r] of [[-30, -330, 34], [0, -350, 40], [30, -330, 34]]) el('circle', { cx, cy, r, fill: '#fff', stroke: '#bdbdbd', 'stroke-width': 4 }, body);
+    el('rect', { x: -48, y: -320, width: 96, height: 30, fill: '#fff', stroke: '#bdbdbd', 'stroke-width': 4 }, body);
+    return { w: 180, h: 390 };
+  }
+  if (d.npc === 'smith') {
+    el('path', { d: 'M-95 0 L -80 -220 Q 0 -250 80 -220 L 95 0 Z', fill: '#546e7a', stroke: '#263238', 'stroke-width': 5 }, body);
+    el('path', { d: 'M-60 -190 H 60 L 70 0 H -70 Z', fill: '#795548', stroke: '#4e342e', 'stroke-width': 5 }, body);
+    el('circle', { cx: 0, cy: -265, r: 48, fill: SKIN, stroke: '#d7a28f', 'stroke-width': 3 }, body);
+    el('path', { d: 'M-44 -255 Q -46 -180 0 -168 Q 46 -180 44 -255 Q 0 -232 -44 -255 Z', fill: '#bf6f2f', stroke: '#8d4a1a', 'stroke-width': 3 }, body);
+    for (const x of [-16, 16]) el('circle', { cx: x, cy: -275, r: 5, fill: '#263238' }, body);
+    el('path', { d: 'M-46 -290 Q 0 -330 46 -290', stroke: '#bf6f2f', 'stroke-width': 14, fill: 'none', 'stroke-linecap': 'round' }, body);
+    return { w: 200, h: 320 };
+  }
+  return baseNpc(body, d);
+};

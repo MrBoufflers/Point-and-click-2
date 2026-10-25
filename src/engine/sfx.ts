@@ -32,6 +32,13 @@ export class Sfx {
     this.note(620, 0, 0.16, { to: 980, gain: 0.18 });
   }
 
+  /** Coup de marteau sur l'enclume : « tiing » métallique. */
+  clang(): void {
+    this.note(1400, 0, 0.25, { type: 'square', gain: 0.06 });
+    this.note(2100, 0, 0.35, { type: 'triangle', gain: 0.1, to: 1900 });
+    this.note(700, 0, 0.12, { type: 'square', gain: 0.05 });
+  }
+
   /** Mauvais champignon : « pouic » rigolo (pas un son d'erreur). */
   pouic(): void {
     this.note(1100, 0, 0.08, { type: 'triangle', to: 1700, gain: 0.12 });

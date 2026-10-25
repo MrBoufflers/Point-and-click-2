@@ -22,13 +22,19 @@ une maison terminée garde une étoile. Les récompenses vont dans le sac (en ha
 
 | Lieu | Ce qu'on fait | Récompense |
 | --- | --- | --- |
-| Écurie | chaque enfant choisit la couleur de sa licorne, puis promenade : 4 croisements (2 par enfant), pas de mauvais chemin | les 2 licornes |
-| Boutique de potions | trouver les 3 ingrédients montrés dans la bulle de l'apothicaire, puis mélanger le chaudron à deux | une potion |
-| Librairie | Elea : ranger par couleur puis du plus petit au plus grand ; Isao : ranger de 1 à 5 | un grimoire ancien |
-| Boulangerie, forge | fermées pour l'instant (cadenas) | |
+| Écurie | chaque enfant choisit la couleur de sa licorne, puis promenade : 4 croisements (2 par enfant) tirés parmi 7, pas de mauvais chemin | les 2 licornes |
+| Boutique de potions | trouver 3 ingrédients montrés dans la bulle de l'apothicaire (tirés parmi 19), puis mélanger le chaudron à deux | une potion |
+| Librairie | Elea : ranger par couleur (3 couleurs parmi 6) puis par taille (dans un sens ou l'autre) ; Isao : ranger de 1 à 4, 5 ou 6 (parfois en compte à rebours) | un grimoire ancien |
+| Boulangerie | Elea : mettre N fruits sur le gâteau (fraises, cerises, sucreries...) ; Isao : mettre N bougies ; puis allumer les bougies à deux | un gâteau magique |
+| Forge | souffler sur le feu à deux ; taper N fois sur l'enclume en comptant ; trouver N clous d'une couleur | des fers à cheval pour les licornes |
 
-Chaque lieu est un fichier `data/place_*.json` décrit étape par étape (`say`, `pick`, `choose_color`, `fork`, `two_touch`,
-`parts`, `show` / `hide`, `move`, `view`, `reward`) ; la carte est dans `data/village.json`.
+**Tous les lieux sont rejouables, et changent à chaque visite** : le contenu est tiré au hasard dans les listes du fichier
+du lieu (`config`), en évitant ce qui est sorti la fois précédente (mémorisé sur l'appareil).
+Le tirage est fait par `src/engine/places/generators.ts` ; une étape `{"type": "slot", "name": ...}` du JSON marque
+l'endroit où il insère les étapes tirées.
+
+Chaque lieu est un fichier `data/place_*.json` décrit étape par étape (`say`, `pick`, `collect`, `tap_count`, `choose_color`,
+`fork`, `two_touch`, `parts`, `show` / `hide`, `move`, `view`, `reward`) ; la carte est dans `data/village.json`.
 
 Entre deux tableaux, une grosse flèche permet de continuer. La progression est gardée sur l'appareil :
 « ▶ » reprend au dernier tableau commencé, et après la Porte la partie suivante repart du début.

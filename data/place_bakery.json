@@ -1,0 +1,99 @@
+{
+  "_meta": {"version": "0.1", "description": "La boulangerie"},
+  "id": "bakery",
+  "reward": "cake",
+  "generator": "bakery",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 800, "y": 170}},
+  "view": {
+    "backdrop": "bakery",
+    "decor": [
+      {"type": "shelf", "x": 500, "y": 400, "width": 460},
+      {"type": "shelf", "x": 500, "y": 560, "width": 460},
+      {"type": "shelf", "x": 1080, "y": 400, "width": 420},
+      {"type": "shelf", "x": 1080, "y": 560, "width": 420},
+      {"type": "shelf", "x": 500, "y": 240, "width": 400},
+      {"type": "breads", "x": 500, "y": 240, "scale": 0.9},
+      {"type": "oven", "x": 1430, "y": 640, "scale": 0.75},
+      {"type": "window", "x": 800, "y": 320, "scale": 0.6}
+    ]
+  },
+  "items": [{"id": "baker", "kind": "npc", "npc": "baker", "x": 200, "y": 880, "scale": 0.95}],
+  "ambient_hotspots": [
+    {"id": "bird", "x": 800, "y": 230, "reaction": "fly_away_and_back", "scale": 0.8},
+    {"id": "snail", "x": 1420, "y": 880, "reaction": "hide", "scale": 0.7}
+  ],
+  "config": {
+    "npc_pitch": 0.85,
+    "cake": {"x": 800, "y": 870},
+    "cake_top": {"x": 800, "y": 720},
+    "cake_colors": [
+      {"color": "#f8bbd0", "name": "à la fraise"},
+      {"color": "#a1887f", "name": "au chocolat"},
+      {"color": "#fff3c4", "name": "à la vanille"},
+      {"color": "#c5e1a5", "name": "à la pistache"}
+    ],
+    "fruits": [
+      {"id": "strawberry", "kind": "strawberry", "plural": "fraises", "scale": 0.95},
+      {"id": "cherry", "kind": "cherry", "plural": "cerises", "scale": 0.9},
+      {"id": "sugar_star", "kind": "star", "color": "#fff59d", "plural": "étoiles en sucre", "scale": 0.5},
+      {"id": "sugar_flower", "kind": "flower", "color": "#ce93d8", "plural": "fleurs en sucre", "scale": 0.5}
+    ],
+    "fruit_min": 2,
+    "fruit_max": 4,
+    "fruit_spots": [
+      {"x": 330, "y": 400},
+      {"x": 440, "y": 400},
+      {"x": 550, "y": 400},
+      {"x": 660, "y": 400},
+      {"x": 330, "y": 560},
+      {"x": 440, "y": 560},
+      {"x": 550, "y": 560},
+      {"x": 660, "y": 560}
+    ],
+    "candle_min": 3,
+    "candle_max": 6,
+    "candle_spots": [
+      {"x": 920, "y": 400},
+      {"x": 1000, "y": 400},
+      {"x": 1080, "y": 400},
+      {"x": 1160, "y": 400},
+      {"x": 1240, "y": 400},
+      {"x": 920, "y": 560},
+      {"x": 1000, "y": 560},
+      {"x": 1080, "y": 560},
+      {"x": 1160, "y": 560},
+      {"x": 1240, "y": 560}
+    ],
+    "candle_colors": ["#4fc3f7", "#f48fb1", "#fff176", "#aed581", "#ce93d8"],
+    "light_area": {"x": 800, "y": 700, "w": 460, "h": 260},
+    "count_words": ["Un !", "Deux !", "Trois !", "Quatre !", "Cinq !", "Six !", "Sept !", "Huit !", "Neuf !", "Dix !"],
+    "lines": {
+      "fruits": "{name}, mets {n} {fruits} sur le gâteau !",
+      "fruits_retry": "Cherche les {fruits}.",
+      "fruits_done": "Bravo {name} ! Le gâteau est tout joli !",
+      "candles": "{name}, maintenant mets {n} bougies sur le gâteau !",
+      "candles_done": "Bravo {name} ! {n} bougies !",
+      "light": "Touchez les bougies tous les deux pour les allumer !",
+      "light_done": "Elles brillent ! Quel beau gâteau {cake} !",
+      "outro": "Merci ! Voici un morceau de gâteau magique, pour avoir des forces pendant votre aventure !",
+      "outro_again": "Merci encore ! Encore un gâteau magique, miam miam !"
+    }
+  },
+  "steps": [
+    {
+      "type": "say",
+      "pitch": 0.85,
+      "text": "Bonjour les enfants ! C'est la fête au village et je prépare un grand gâteau. Vous m'aidez à le décorer ?"
+    },
+    {
+      "type": "parts",
+      "parts": {"elea": [{"type": "slot", "name": "fruits"}], "isao": [{"type": "slot", "name": "candles"}]}
+    },
+    {"type": "slot", "name": "light"},
+    {"type": "slot", "name": "outro"},
+    {"type": "reward", "from": {"x": 800, "y": 480}}
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour retourner au village !"}
+}

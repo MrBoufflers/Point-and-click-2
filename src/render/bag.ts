@@ -70,6 +70,12 @@ export function drawRewardIcon(g: SVGGElement, id: string, look: RewardLook): vo
     drawItem(g, { kind: 'bottle', color: '#f06292', x: 0, y: 38, scale: 0.62 });
   } else if (id === 'grimoire') {
     drawItem(g, { kind: 'grimoire', x: 0, y: 30, scale: 0.48 });
+  } else if (id === 'cake') {
+    drawItem(g, { kind: 'cake', color: '#f8bbd0', x: 0, y: 26, scale: 0.17 });
+    drawItem(g, { kind: 'strawberry', x: 0, y: -2, scale: 0.4 });
+  } else if (id === 'horseshoes') {
+    drawItem(g, { kind: 'horseshoe', color: '#ffca28', x: -14, y: 30, scale: 0.5 });
+    drawItem(g, { kind: 'horseshoe', color: '#b0bec5', x: 16, y: 34, scale: 0.5 });
   } else {
     el('circle', { r: 20, fill: '#ffd54f' }, g);
   }

@@ -1,7 +1,8 @@
 {
-  "_meta": {"version": "0.1", "description": "La librairie"},
+  "_meta": {"version": "0.2", "description": "La librairie"},
   "id": "library",
   "reward": "grimoire",
+  "generator": "library",
   "hint_delays_s": [8, 15, 25],
   "auto_solve_after_s": 35,
   "lumi": {"home": {"x": 300, "y": 200}},
@@ -9,147 +10,56 @@
     "backdrop": "library",
     "decor": [
       {"type": "bookcase", "x": 900, "y": 560, "width": 1000, "height": 450, "shelves": 3},
-      {"type": "marker", "x": 440, "y": 252, "color": "red"},
-      {"type": "marker", "x": 440, "y": 402, "color": "blue"},
-      {"type": "marker", "x": 440, "y": 552, "color": "yellow"},
       {"type": "counter", "x": 880, "y": 880, "width": 840},
       {"type": "window", "x": 1500, "y": 520, "scale": 0.7}
     ]
   },
-  "items": [
-    {"id": "librarian", "kind": "npc", "npc": "librarian", "x": 210, "y": 880},
-    {
-      "id": "b_blue_1",
-      "kind": "book",
-      "color": "#1e88e5",
-      "x": 560,
-      "y": 715,
-      "scale": 0.9,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "b_red_1",
-      "kind": "book",
-      "color": "#e53935",
-      "x": 690,
-      "y": 715,
-      "scale": 0.9,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "b_yellow_1",
-      "kind": "book",
-      "color": "#fdd835",
-      "x": 820,
-      "y": 715,
-      "scale": 0.9,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "b_red_2",
-      "kind": "book",
-      "color": "#e53935",
-      "x": 950,
-      "y": 715,
-      "scale": 0.9,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "b_yellow_2",
-      "kind": "book",
-      "color": "#fdd835",
-      "x": 1080,
-      "y": 715,
-      "scale": 0.9,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "b_blue_2",
-      "kind": "book",
-      "color": "#1e88e5",
-      "x": 1210,
-      "y": 715,
-      "scale": 0.9,
-      "tap": true,
-      "hidden": true
-    },
-    {"id": "g_mid", "kind": "book", "color": "#43a047", "x": 650, "y": 715, "scale": 1.0, "tap": true, "hidden": true},
-    {"id": "g_big", "kind": "book", "color": "#43a047", "x": 880, "y": 715, "scale": 1.3, "tap": true, "hidden": true},
-    {
-      "id": "g_small",
-      "kind": "book",
-      "color": "#43a047",
-      "x": 1110,
-      "y": 715,
-      "scale": 0.7,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "n_3",
-      "kind": "book",
-      "color": "#00897b",
-      "x": 560,
-      "y": 715,
-      "scale": 1.0,
-      "number": 3,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "n_1",
-      "kind": "book",
-      "color": "#8e24aa",
-      "x": 725,
-      "y": 715,
-      "scale": 1.0,
-      "number": 1,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "n_5",
-      "kind": "book",
-      "color": "#3949ab",
-      "x": 890,
-      "y": 715,
-      "scale": 1.0,
-      "number": 5,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "n_2",
-      "kind": "book",
-      "color": "#fb8c00",
-      "x": 1055,
-      "y": 715,
-      "scale": 1.0,
-      "number": 2,
-      "tap": true,
-      "hidden": true
-    },
-    {
-      "id": "n_4",
-      "kind": "book",
-      "color": "#e53935",
-      "x": 1220,
-      "y": 715,
-      "scale": 1.0,
-      "number": 4,
-      "tap": true,
-      "hidden": true
-    }
-  ],
+  "items": [{"id": "librarian", "kind": "npc", "npc": "librarian", "x": 210, "y": 880}],
   "ambient_hotspots": [
     {"id": "owl", "x": 1490, "y": 220, "reaction": "blink"},
     {"id": "butterfly", "x": 1500, "y": 640, "reaction": "flutter", "color": "#4dd0e1", "scale": 0.8}
   ],
+  "config": {
+    "rows": {"top": 246, "mid": 396, "low": 546},
+    "table_y": 715,
+    "markers": [{"x": 440, "y": 252}, {"x": 440, "y": 402}, {"x": 440, "y": 552}],
+    "palette": [
+      {"id": "red", "color": "#e53935", "m": "rouge", "f": "rouge", "mp": "rouges"},
+      {"id": "blue", "color": "#1e88e5", "m": "bleu", "f": "bleue", "mp": "bleus"},
+      {"id": "yellow", "color": "#fdd835", "m": "jaune", "f": "jaune", "mp": "jaunes"},
+      {"id": "green", "color": "#43a047", "m": "vert", "f": "verte", "mp": "verts"},
+      {"id": "purple", "color": "#8e24aa", "m": "violet", "f": "violette", "mp": "violets"},
+      {"id": "orange", "color": "#fb8c00", "m": "orange", "f": "orange", "mp": "oranges"}
+    ],
+    "number_colors": ["#8e24aa", "#fb8c00", "#00897b", "#e53935", "#3949ab", "#6d4c41"],
+    "numbers_min": 4,
+    "numbers_max": 6,
+    "countdown_chance": 0.3,
+    "lines": {
+      "color_first": "{name}, range les livres par couleur ! Mets un livre {m} sur l'étagère {f}.",
+      "color_next": "Maintenant, un livre {m} sur l'étagère {f} !",
+      "color_more": "Encore un livre {m} !",
+      "color_retry": "Cherche un livre {m}.",
+      "color_done": "Bravo {name} ! Chaque livre est sur l'étagère de sa couleur !",
+      "size_up": "{name}, maintenant range les livres {mp}, du plus petit au plus grand. Touche le plus petit !",
+      "size_down": "{name}, maintenant range les livres {mp}, du plus grand au plus petit. Touche le plus grand !",
+      "size_mid": "Maintenant le moyen, ni trop petit, ni trop grand !",
+      "size_last_up": "Et le plus grand de tous !",
+      "size_last_down": "Et le plus petit de tous !",
+      "retry_small": "Cherche le plus petit livre.",
+      "retry_mid": "Cherche le livre moyen.",
+      "retry_big": "Cherche le plus grand livre.",
+      "size_done_up": "Bravo {name} ! Du plus petit au plus grand !",
+      "size_done_down": "Bravo {name} ! Du plus grand au plus petit !",
+      "num_up": "{name}, range les livres dans l'ordre, de 1 à {n}. Touche le livre numéro 1 !",
+      "num_down": "{name}, on fait un compte à rebours ! Range les livres de {n} à 1. Touche le livre numéro {n} !",
+      "num_next": "Maintenant le numéro {k} !",
+      "num_last": "Et le numéro {k} !",
+      "num_retry": "Cherche le livre avec le chiffre {k}.",
+      "num_done_up": "Bravo {name} ! Tous les livres sont rangés de 1 à {n} !",
+      "num_done_down": "Bravo {name} ! Trois, deux, un... décollage !"
+    }
+  },
   "steps": [
     {
       "type": "say",
@@ -159,114 +69,8 @@
     {
       "type": "parts",
       "parts": {
-        "elea": [
-          {"type": "show", "ids": ["b_blue_1", "b_red_1", "b_yellow_1", "b_red_2", "b_yellow_2", "b_blue_2"]},
-          {
-            "type": "pick",
-            "prompt": "Elea, range les livres par couleur ! Mets un livre rouge sur l'étagère rouge.",
-            "accept": ["b_red_1", "b_red_2"],
-            "dest": {"x": 520, "y": 246},
-            "retry_line": "Cherche un livre rouge."
-          },
-          {
-            "type": "pick",
-            "prompt": "Encore un livre rouge !",
-            "accept": ["b_red_1", "b_red_2"],
-            "dest": {"x": 600, "y": 246},
-            "retry_line": "Cherche un livre rouge."
-          },
-          {
-            "type": "pick",
-            "prompt": "Maintenant, un livre bleu sur l'étagère bleue !",
-            "accept": ["b_blue_1", "b_blue_2"],
-            "dest": {"x": 520, "y": 396},
-            "retry_line": "Cherche un livre bleu."
-          },
-          {
-            "type": "pick",
-            "prompt": "Encore un livre bleu !",
-            "accept": ["b_blue_1", "b_blue_2"],
-            "dest": {"x": 600, "y": 396},
-            "retry_line": "Cherche un livre bleu."
-          },
-          {
-            "type": "pick",
-            "prompt": "Et un livre jaune sur l'étagère jaune !",
-            "accept": ["b_yellow_1", "b_yellow_2"],
-            "dest": {"x": 520, "y": 546},
-            "retry_line": "Cherche un livre jaune."
-          },
-          {
-            "type": "pick",
-            "prompt": "Encore un livre jaune !",
-            "accept": ["b_yellow_1", "b_yellow_2"],
-            "dest": {"x": 600, "y": 546},
-            "retry_line": "Cherche un livre jaune.",
-            "success_line": "Bravo Elea ! Chaque livre est sur l'étagère de sa couleur !"
-          },
-          {"type": "show", "ids": ["g_mid", "g_big", "g_small"]},
-          {
-            "type": "pick",
-            "prompt": "Elea, maintenant range les livres verts, du plus petit au plus grand. Touche le plus petit !",
-            "accept": ["g_small"],
-            "dest": {"x": 760, "y": 246, "scale": 0.7},
-            "retry_line": "Celui-là est plus grand. Cherche le plus petit !"
-          },
-          {
-            "type": "pick",
-            "prompt": "Maintenant le moyen, ni trop petit, ni trop grand !",
-            "accept": ["g_mid"],
-            "dest": {"x": 850, "y": 246, "scale": 1.0},
-            "retry_line": "Cherche le livre moyen."
-          },
-          {
-            "type": "pick",
-            "prompt": "Et le plus grand de tous !",
-            "accept": ["g_big"],
-            "dest": {"x": 960, "y": 246, "scale": 1.3},
-            "retry_line": "Cherche le plus grand !",
-            "success_line": "Bravo Elea ! Du plus petit au plus grand !"
-          }
-        ],
-        "isao": [
-          {"type": "show", "ids": ["n_3", "n_1", "n_5", "n_2", "n_4"]},
-          {
-            "type": "pick",
-            "prompt": "Isao, range les livres dans l'ordre, de 1 à 5. Touche le livre numéro 1 !",
-            "accept": ["n_1"],
-            "dest": {"x": 820, "y": 396, "scale": 1.0},
-            "retry_line": "Cherche le livre avec le chiffre 1."
-          },
-          {
-            "type": "pick",
-            "prompt": "Maintenant le numéro 2 !",
-            "accept": ["n_2"],
-            "dest": {"x": 900, "y": 396, "scale": 1.0},
-            "retry_line": "Cherche le livre avec le chiffre 2."
-          },
-          {
-            "type": "pick",
-            "prompt": "Le numéro 3 !",
-            "accept": ["n_3"],
-            "dest": {"x": 980, "y": 396, "scale": 1.0},
-            "retry_line": "Cherche le livre avec le chiffre 3."
-          },
-          {
-            "type": "pick",
-            "prompt": "Le numéro 4 !",
-            "accept": ["n_4"],
-            "dest": {"x": 1060, "y": 396, "scale": 1.0},
-            "retry_line": "Cherche le livre avec le chiffre 4."
-          },
-          {
-            "type": "pick",
-            "prompt": "Et le numéro 5 !",
-            "accept": ["n_5"],
-            "dest": {"x": 1140, "y": 396, "scale": 1.0},
-            "retry_line": "Cherche le livre avec le chiffre 5.",
-            "success_line": "Bravo Isao ! Un, deux, trois, quatre, cinq !"
-          }
-        ]
+        "elea": [{"type": "slot", "name": "colors"}, {"type": "slot", "name": "sizes"}],
+        "isao": [{"type": "slot", "name": "numbers"}]
       }
     },
     {

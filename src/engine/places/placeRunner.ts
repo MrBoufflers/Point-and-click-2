@@ -158,6 +158,12 @@ export class PlaceRunner extends PlaceBase {
       case 'pick':
         await this.pick(s, ctx);
         return;
+      case 'collect':
+        await this.collect(s, ctx);
+        return;
+      case 'tap_count':
+        await this.tapCount(s, ctx);
+        return;
       case 'choose_color':
         await this.chooseColor(s, ctx);
         return;
@@ -247,6 +253,122 @@ export class PlaceRunner extends PlaceBase {
       bubble.remove();
     }
     if (s.success_line) await this.step(this.say(this.text(s.success_line, who)));
+  }
+
+  /** Prendre `count` objets parmi ceux acceptés (on compte à voix haute). */
+  private async collect(s: Extract<StepDef, { type: 'collect' }>, ctx?: PlayerId): Promise<void> {
+    const who = this.resolvePlayer(s.player, ctx);
+    this.portraits.setActive(who);
+    const prompt = this.text(s.prompt, who);
+    void this.say(prompt, { prompt: true });
+    let got = 0;
+    let lastRetry = 0;
+    let finish: (() => void) | null = null;
+    const accepted = () => s.accept.map((id) => this.items.get(id)).filter((l): l is Live => !!l && !l.used);
+    const choose = (live: Live) => {
+      if (got >= s.count) return;
+      if (!s.accept.includes(live.def.id)) {
+        this.o.sfx.pouic();
+        void wobble(live.shape.body);
+        const now = performance.now();
+        if (s.retry_line && now - lastRetry > 4000) {
+          lastRetry = now;
+          void this.say(this.text(s.retry_line, who));
+        }
+        return;
+      }
+      live.used = true;
+      this.input.setEnabled(`it_${live.def.id}`, false);
+      live.shape.body.classList.remove('hint-sparkle');
+      const k = got++;
+      this.progress();
+      this.o.sfx.success();
+      void this.say(s.count_words?.[k] ?? String(k + 1));
+      const dest = s.dests[k % s.dests.length];
+      void (async () => {
+        await hop(live.shape.body);
+        const from = { x: live.def.x, y: live.def.y };
+        const fromScale = live.def.scale ?? 1;
+        await flyItem(live.shape, from, fromScale, dest, dest.scale ?? fromScale, 700);
+        Object.assign(live.def, { x: dest.x, y: dest.y, scale: dest.scale ?? fromScale });
+        if (dest.vanish) live.shape.root.style.display = 'none';
+        if (got >= s.count) {
+          this.onPick = null;
+          finish?.();
+        }
+      })();
+    };
+    this.onPick = choose;
+    await this.withHints({
+      done: new Promise<void>((r) => (finish = r)),
+      hintTarget: () => {
+        const t = accepted()[0];
+        if (!t || got >= s.count) return null;
+        const sc = t.def.scale ?? 1;
+        return { x: t.def.x, y: t.def.y - (t.shape.h / 2) * sc, top: t.def.y - t.shape.h * sc, mark: (on) => t.shape.body.classList.toggle('hint-sparkle', on) };
+      },
+      autoSolve: () => {
+        const t = accepted()[0];
+        if (t) choose(t);
+      },
+    }, prompt, this.o.place.hint_delays_s, this.o.place.auto_solve_after_s);
+    await this.step(this.clock.wait(300));
+    if (s.success_line) await this.step(this.say(this.text(s.success_line, who)));
+  }
+
+  /** Taper `count` fois sur une zone (ex. l'enclume) en comptant. */
+  private async tapCount(s: Extract<StepDef, { type: 'tap_count' }>, ctx?: PlayerId): Promise<void> {
+    const who = this.resolvePlayer(s.player, ctx);
+    this.portraits.setActive(who);
+    const prompt = this.text(s.prompt, who);
+    void this.say(prompt, { prompt: true });
+    const a = s.area;
+    const tool = s.tool ? this.items.get(s.tool) : undefined;
+    let hits = 0;
+    let busyUntil = 0;
+    let finish: (() => void) | null = null;
+    const hit = () => {
+      const now = performance.now();
+      // Un coup à la fois : on laisse le temps de compter (aucune pénalité si on tape trop vite).
+      if (hits >= s.count || now < busyUntil) return;
+      busyUntil = now + 650;
+      hits += 1;
+      this.progress();
+      this.o.sfx.clang();
+      if (tool) void animate(tool.shape.body, [{ transform: 'rotate(0)' }, { transform: 'rotate(-35deg)', offset: 0.35 }, { transform: 'rotate(10deg)', offset: 0.6 }, { transform: 'rotate(0)' }], { duration: 450, easing: 'ease-in-out' });
+      this.sparks(a.x, a.y - a.h / 4);
+      void this.say(s.count_words?.[hits - 1] ?? String(hits));
+      if (hits >= s.count) window.setTimeout(() => finish?.(), 700);
+    };
+    this.input.add({ id: 'tap_count', cx: a.x, cy: a.y, w: a.w, h: a.h, enabled: true, onDown: hit });
+    await this.withHints({
+      done: new Promise<void>((r) => (finish = r)),
+      hintTarget: () => (hits >= s.count ? null : { x: a.x, y: a.y, top: a.y - a.h / 2, mark: (on) => tool?.shape.body.classList.toggle('hint-sparkle', on) }),
+      autoSolve: () => {
+        busyUntil = 0;
+        hit();
+      },
+    }, prompt, this.o.place.hint_delays_s, this.o.place.auto_solve_after_s);
+    this.input.remove('tap_count');
+    for (const id of s.then_show ?? []) {
+      const live = this.items.get(id);
+      if (!live) continue;
+      live.shape.root.style.display = '';
+      void animate(live.shape.body, [{ transform: 'scale(0)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 500, easing: 'ease-out' });
+    }
+    if (s.then_show?.length) this.o.sfx.success();
+    if (s.success_line) await this.step(this.say(this.text(s.success_line, who)));
+  }
+
+  private sparks(x: number, y: number): void {
+    for (let i = 0; i < 9; i++) {
+      const b = el('circle', { r: 5 + (i % 3) * 2, fill: i % 2 ? '#ffd54f' : '#ff7043' }, this.stage.layers.fx);
+      const ang = -Math.PI * (0.1 + 0.8 * (i / 8));
+      void tween(450, (k) => {
+        b.setAttribute('transform', `translate(${x + Math.cos(ang) * 120 * k} ${y + Math.sin(ang) * 120 * k + 80 * k * k})`);
+        b.setAttribute('opacity', String(1 - k));
+      }).then(() => b.remove());
+    }
   }
 
   private splash(x: number, y: number): void {
@@ -382,8 +504,7 @@ export class PlaceRunner extends PlaceBase {
     }, prompt, this.o.place.hint_delays_s, this.o.place.auto_solve_after_s);
     this.o.sfx.party();
     if (effectItem && s.effect) {
-      const liquid = effectItem.shape.body.querySelector('[data-role="liquid"]');
-      liquid?.setAttribute('fill', colorOf(s.effect.color));
+      effectItem.shape.body.querySelectorAll('[data-role="liquid"]').forEach((n) => n.setAttribute('fill', colorOf(s.effect!.color)));
       void animate(effectItem.shape.body, [{ transform: 'rotate(0)' }, { transform: 'rotate(-8deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(0)' }], { duration: 900 });
       this.splash(a.x, a.y - a.h / 4);
     }
