@@ -1,6 +1,7 @@
 {
   "_meta": { "version": "0.1", "description": "Valeurs par défaut du POC (surchargées par les réglages parent enregistrés sur l'appareil)" },
   "level": "level_1.json",
+  "village": "village.json",
   "first_player": "elea",
   "players": [
     { "id": "elea", "name": "Elea", "initial": "E", "color": "#ec407a", "side": "left" },

@@ -42,11 +42,13 @@ export function drawShapePath(parent: SVGGElement, shape: string, cx: number, cy
   }
 }
 
-type Drawer = (body: SVGGElement, def: ItemDef) => { w: number; h: number };
+export type ItemDrawer = (body: SVGGElement, def: ItemDef) => { w: number; h: number };
+type Drawer = ItemDrawer;
 
 const shadow = (body: SVGGElement, rx = 44) => el('ellipse', { cx: 0, cy: 2, rx, ry: 9, fill: '#000', opacity: 0.2 }, body);
 
-const DRAWERS: Record<string, Drawer> = {
+/** Types d'objets disponibles (d'autres fichiers peuvent en ajouter). */
+export const DRAWERS: Record<string, Drawer> = {
   shape(body, d) {
     const c = colorOf(d.color ?? '#90a4ae');
     shadow(body);

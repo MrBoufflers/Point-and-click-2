@@ -15,6 +15,21 @@ Jeu point-and-click pour deux enfants non-lecteurs qui jouent ensemble sur un se
 | 5 | Montagne (bleue) | quantités | attraper exactement 2 étoiles | combien d'oiseaux ? |
 | 6 | La Porte des 5 gemmes | coopération | les gemmes vont dans la porte, on la touche à deux | |
 
+## Chapitre 2 : le village
+
+Après la Porte, Isao et Elea arrivent dans un village vu d'en haut. On touche la maison qu'on veut, dans l'ordre qu'on veut ;
+une maison terminée garde une étoile. Les récompenses vont dans le sac (en haut) et servent pour la suite.
+
+| Lieu | Ce qu'on fait | Récompense |
+| --- | --- | --- |
+| Écurie | chaque enfant choisit la couleur de sa licorne, puis promenade : 4 croisements (2 par enfant), pas de mauvais chemin | les 2 licornes |
+| Boutique de potions | trouver les 3 ingrédients montrés dans la bulle de l'apothicaire, puis mélanger le chaudron à deux | une potion |
+| Librairie | Elea : ranger par couleur puis du plus petit au plus grand ; Isao : ranger de 1 à 5 | un grimoire ancien |
+| Boulangerie, forge | fermées pour l'instant (cadenas) | |
+
+Chaque lieu est un fichier `data/place_*.json` décrit étape par étape (`say`, `pick`, `choose_color`, `fork`, `two_touch`,
+`parts`, `show` / `hide`, `move`, `view`, `reward`) ; la carte est dans `data/village.json`.
+
 Entre deux tableaux, une grosse flèche permet de continuer. La progression est gardée sur l'appareil :
 « ▶ » reprend au dernier tableau commencé, et après la Porte la partie suivante repart du début.
 
@@ -87,6 +102,7 @@ src/
     gemTouch.ts        la gemme à toucher à deux
     twoTouch.ts        détection « touchez tous les deux » (gemme et Porte)
     finale.ts          la Porte des 5 gemmes
+    places/            le village : carte (hub.ts), lieux décrits par étapes (placeRunner.ts)
     hints.ts           minuteries d'aide progressive
     voice.ts           file de phrases (speechSynthesis), jamais deux voix en même temps
     sfx.ts             sons synthétisés Web Audio

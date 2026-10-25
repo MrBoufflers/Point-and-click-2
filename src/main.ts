@@ -1,10 +1,13 @@
 import './style.css';
 import { FinaleRunner } from './engine/finale';
+import { VillageHub } from './engine/places/hub';
+import { PlaceRunner } from './engine/places/placeRunner';
+import type { RewardLook } from './render/bag';
 import { SceneRunner } from './engine/sceneRunner';
 import { Sfx } from './engine/sfx';
 import { Voice } from './engine/voice';
 import { loadJSON, loadPrefs, savePrefs, type Prefs } from './settings';
-import type { GameSettings, LevelDef, SceneDef } from './types';
+import type { GameSettings, HouseDef, LevelDef, PlaceDef, SceneDef, VillageDef } from './types';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -32,12 +35,14 @@ boot().catch((err: unknown) => {
   p.textContent = `Erreur de chargement : ${err instanceof Error ? err.message : String(err)}`;
 });
 
-const isFile = (f: string | null): f is string => !!f && /^[\w-]+\.json$/.test(f);
+const isFile = (f: string | null | undefined): f is string => !!f && /^[\w-]+\.json$/.test(f);
 
-/** Ce qui se joue : un niveau (suite de tableaux + Porte) ou une scène seule (?scene=...). */
+/** Ce qui se joue : un niveau (suite de tableaux + Porte) ou une scène seule (?scene=...), puis le village. */
 interface Game {
   scenes: SceneDef[];
   level: LevelDef | null;
+  village: VillageDef | null;
+  places: Map<string, PlaceDef>;
 }
 
 async function loadGame(settings: GameSettings): Promise<Game> {
@@ -47,14 +52,24 @@ async function loadGame(settings: GameSettings): Promise<Game> {
   const scenes = await Promise.all(files.map((f) => loadJSON<SceneDef>(`./data/${f}`)));
   // Les phrases communes du niveau complètent celles de chaque scène.
   for (const s of scenes) s.lines = { ...level.lines, ...s.lines } as SceneDef['lines'];
-  return { scenes, level: isFile(single) ? null : level };
+  const places = new Map<string, PlaceDef>();
+  let village: VillageDef | null = null;
+  if (!isFile(single) && settings.village) {
+    village = await loadJSON<VillageDef>(`./data/${settings.village}`);
+    const files = village.houses.map((h) => h.place).filter(isFile);
+    const defs = await Promise.all(files.map((f) => loadJSON<PlaceDef>(`./data/${f}`)));
+    files.forEach((f, i) => places.set(f, defs[i]));
+  }
+  return { scenes, level: isFile(single) ? null : level, village, places };
 }
 
 async function boot(): Promise<void> {
   const settings = await loadJSON<GameSettings>('./data/settings.json');
   const game = await loadGame(settings);
   const prefs = loadPrefs(settings);
-  const lastBoard = game.level ? game.scenes.length : game.scenes.length - 1;
+  const doorBoard = game.scenes.length;
+  const villageBoard = game.village ? doorBoard + 1 : -1;
+  const lastBoard = game.village ? villageBoard : game.level ? doorBoard : game.scenes.length - 1;
   if (prefs.board > lastBoard) prefs.board = 0;
 
   const voice = new Voice(settings.voice.lang);
@@ -68,8 +83,11 @@ async function boot(): Promise<void> {
   const ear = $('ear');
   const restart = $('restart');
   const next = $('next');
-  let runner: SceneRunner | FinaleRunner | null = null;
+  let runner: { start(): void; dispose(): void; setSpeaking(b: boolean): void } | null = null;
   let current = 0;
+  /** Ce que fait la grosse flèche « suivant ». */
+  let onNext: () => void = () => startBoard(current + 1);
+  let villageVisited = prefs.board === villageBoard;
 
   voice.onSpeakingChange = (b) => runner?.setSpeaking(b);
 
@@ -78,25 +96,98 @@ async function boot(): Promise<void> {
     savePrefs(prefs);
   };
 
-  /** Lance le tableau n° `board` (le dernier numéro = la Porte). */
-  const startBoard = (board: number) => {
+  // ---- Village : sac et licornes ----
+  const look: RewardLook = {};
+  const refreshLook = () => {
+    look.unicorns = settings.players.map((p) => prefs.village.unicorns[p.id]).filter((c): c is string => !!c);
+  };
+  const rewardsWon = () =>
+    (game.village?.houses ?? [])
+      .filter((h) => h.place && prefs.village.done.includes(h.id))
+      .map((h) => game.places.get(h.place!)?.reward)
+      .filter((r): r is string => !!r);
+
+  const resetScreen = () => {
     runner?.dispose();
-    current = Math.max(0, Math.min(board, lastBoard));
-    save(current);
     restart.hidden = true;
     next.hidden = true;
     hud.hidden = false;
     ear.hidden = false;
+  };
+
+  const villageCommon = () => {
+    refreshLook();
+    return {
+      container: stageEl, settings, prefs, voice, sfx, debug,
+      bagIds: game.village?.bag.map((b) => b.id) ?? [],
+      rewards: rewardsWon(),
+      look,
+    };
+  };
+
+  const startVillage = () => {
+    if (!game.village) return;
+    resetScreen();
+    current = villageBoard;
+    save(current);
+    const first = !villageVisited;
+    villageVisited = true;
+    runner = new VillageHub({
+      ...villageCommon(), village: game.village, done: prefs.village.done, firstVisit: first,
+      onEnter: (h) => startPlace(h),
+    });
+    runner.start();
+  };
+
+  const startPlace = (house: HouseDef) => {
+    const def = house.place ? game.places.get(house.place) : undefined;
+    if (!def) return;
+    resetScreen();
+    runner = new PlaceRunner({
+      ...villageCommon(), place: def,
+      onUnicorn: (player, color) => {
+        prefs.village.unicorns[player] = color;
+        savePrefs(prefs);
+        refreshLook();
+      },
+      onReward: () => {
+        if (!prefs.village.done.includes(house.id)) prefs.village.done.push(house.id);
+        savePrefs(prefs);
+      },
+      onState: (s) => {
+        if (s !== 'end') return;
+        ear.hidden = true;
+        onNext = startVillage;
+        next.hidden = false;
+      },
+    });
+    runner.start();
+  };
+
+  /** Lance le tableau n° `board` (après les scènes : la Porte, puis le village). */
+  const startBoard = (board: number) => {
+    const b = Math.max(0, Math.min(board, lastBoard));
+    if (b === villageBoard) return startVillage();
+    resetScreen();
+    current = b;
+    save(current);
+    onNext = () => startBoard(current + 1);
     const gemsBefore = game.scenes.slice(0, current).map((s) => s.gem);
 
-    if (game.level && current === game.scenes.length) {
+    if (game.level && current === doorBoard) {
       runner = new FinaleRunner({
         container: stageEl, finale: game.level.finale, settings, voice, sfx, debug, gems: gemsBefore,
         onState: (s) => {
           if (s !== 'end') return;
-          save(0); // la prochaine partie repart du début
           ear.hidden = true;
-          restart.hidden = false;
+          if (game.village) {
+            // La Porte s'ouvre sur le village.
+            save(villageBoard);
+            next.hidden = false;
+          } else {
+            save(0);
+            restart.hidden = false;
+          }
         },
       });
     } else {
@@ -139,7 +230,7 @@ async function boot(): Promise<void> {
   });
   next.addEventListener('click', () => {
     sfx.unlock();
-    startBoard(current + 1);
+    onNext();
   });
 
   ear.addEventListener('pointerdown', (e) => {
@@ -149,7 +240,8 @@ async function boot(): Promise<void> {
   });
 
   const boardNames = game.scenes.map((s, i) => `${i + 1}. ${s._meta?.description ?? s.id}`);
-  if (game.level) boardNames.push(`${game.scenes.length + 1}. La Porte des 5 gemmes`);
+  if (game.level) boardNames.push(`${doorBoard + 1}. La Porte des 5 gemmes`);
+  if (game.village) boardNames.push(`${villageBoard + 1}. ${game.village._meta?.description ?? 'Le village'}`);
   setupParentPanel({
     settings, prefs, voice,
     testLine: game.scenes[0].lines.voice_test ?? game.scenes[0].lines.gem_touch,
@@ -158,6 +250,12 @@ async function boot(): Promise<void> {
     goTo: (b) => {
       $('start').hidden = true;
       startBoard(b);
+    },
+    resetAll: () => {
+      $('start').hidden = true;
+      prefs.village = { done: [], unicorns: {} };
+      villageVisited = false;
+      startBoard(0);
     },
   });
 }
@@ -184,9 +282,10 @@ interface PanelOptions {
   boardNames: string[];
   current: () => number;
   goTo: (board: number) => void;
+  resetAll: () => void;
 }
 
-function setupParentPanel({ settings, prefs, voice, testLine, boardNames, current, goTo }: PanelOptions): void {
+function setupParentPanel({ settings, prefs, voice, testLine, boardNames, current, goTo, resetAll }: PanelOptions): void {
   const gear = $('gear');
   const panel = $('panel');
   const LONG_PRESS_MS = 3000;
@@ -277,7 +376,7 @@ function setupParentPanel({ settings, prefs, voice, testLine, boardNames, curren
   });
   $('panel-reset').addEventListener('click', () => {
     close();
-    goTo(0);
+    resetAll();
   });
   panel.addEventListener('pointerdown', (e) => {
     if (e.target === panel) close();

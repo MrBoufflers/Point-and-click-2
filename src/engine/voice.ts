@@ -7,11 +7,14 @@
 export interface SayOptions {
   /** La phrase est une consigne : c'est elle que le bouton oreille fera répéter. */
   prompt?: boolean;
+  /** Hauteur de voix pour cette phrase (ex. un personnage du village). */
+  pitch?: number;
 }
 
 interface Item {
   text: string;
   resolve: () => void;
+  pitch?: number;
 }
 
 // Après cancel(), certains navigateurs (Chrome Android, Safari) ignorent un speak() trop rapproché.
@@ -62,7 +65,7 @@ export class Voice {
   say(text: string, opts: SayOptions = {}): Promise<void> {
     if (opts.prompt) this.lastPrompt = text;
     return new Promise((resolve) => {
-      this.queue.push({ text, resolve });
+      this.queue.push({ text, resolve, pitch: opts.pitch });
       this.pump();
     });
   }
@@ -130,7 +133,7 @@ export class Voice {
     if (this.voice) u.voice = this.voice;
     u.rate = this.rate;
     u.volume = this.volume;
-    u.pitch = this.pitch;
+    u.pitch = item.pitch ?? this.pitch;
     u.onstart = () => {
       if (this.current === item) this.setSpeaking(true);
     };

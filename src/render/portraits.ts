@@ -22,11 +22,12 @@ export class Portraits {
     }
   }
 
-  /** null : les deux portraits au repos. */
-  setActive(id: PlayerId | null): void {
+  /** null : les deux portraits au repos ; 'both' : les deux brillent. */
+  setActive(id: PlayerId | 'both' | null): void {
     for (const [pid, g] of this.items) {
-      g.classList.toggle('active', id === pid);
-      g.classList.toggle('dim', id !== null && id !== pid);
+      const on = id === pid || id === 'both';
+      g.classList.toggle('active', on);
+      g.classList.toggle('dim', id !== null && !on);
     }
   }
 }

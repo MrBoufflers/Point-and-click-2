@@ -26,6 +26,15 @@ export interface ItemDef {
   scale?: number;
   /** Ce que dit Lumi quand elle montre l'objet en aidant (ex. « rouge »). */
   say?: string;
+  /** Livre : chiffre sur la couverture. */
+  number?: number;
+  /** Personnage : apothecary, librarian... */
+  npc?: string;
+  /** Licorne : initiale de l'enfant monté dessus, et sa couleur. */
+  rider?: string;
+  rider_color?: string;
+  /** Licorne : regarde vers la gauche. */
+  flip?: boolean;
 }
 
 /** Ancien nom, gardé pour compatibilité. */
@@ -158,6 +167,8 @@ export interface PlayerDef {
 
 export interface GameSettings {
   level: string;
+  /** Chapitre 2 : le village (après la Porte). */
+  village?: string;
   /** Scène seule (ancien mode, et ?scene=...). */
   scene?: string;
   first_player: PlayerId;
@@ -166,4 +177,120 @@ export interface GameSettings {
   voice: { lang: string; rate: number; volume: number; pitch: number; rate_min: number; rate_max: number };
   touch: { min_target_px: number; hit_padding: number };
   gem_touch: { two_finger_window_ms: number; single_hold_ms: number; single_taps: number };
+}
+
+// ---------------- Village (chapitre 2) ----------------
+
+/** Une « vue » : un fond et son décor (un lieu peut en changer, ex. la promenade à licorne). */
+export interface ViewDef {
+  backdrop: string;
+  background?: { sky_top?: string; sky_bottom?: string; ground?: string };
+  decor: DecorDef[];
+}
+
+export interface HouseDef {
+  id: string;
+  x: number;
+  y: number;
+  roof: string;
+  wall?: string;
+  /** Icône de l'enseigne : unicorn, potion, book, lock... */
+  sign: string;
+  /** Fichier du lieu ; absent = maison fermée pour l'instant. */
+  place?: string;
+  /** Ce que dit Lumi quand on touche la maison. */
+  line: string;
+  scale?: number;
+}
+
+export interface BagSlotDef {
+  /** Récompense : unicorns, potion, grimoire... */
+  id: string;
+}
+
+export interface VillageDef {
+  _meta?: { version: string; description: string };
+  id: string;
+  view: ViewDef;
+  houses: HouseDef[];
+  bag: BagSlotDef[];
+  /** Place centrale (fontaine) d'où partent les chemins. */
+  fountain: Point;
+  ambient_hotspots: AmbientDef[];
+  hint_delays_s: number[];
+  lumi: { home: Point };
+  lines: {
+    intro: string;
+    prompt: string;
+    closed: string;
+    all_done: string;
+  };
+}
+
+/** Qui joue une étape : un enfant précis, le 1er / 2e selon l'ordre choisi par le parent, ou les deux. */
+export type StepPlayer = PlayerId | 'first' | 'second' | 'both';
+
+export interface Dest extends Point {
+  scale?: number;
+  /** L'objet disparaît en arrivant (dans le chaudron...). */
+  vanish?: boolean;
+}
+
+export type StepDef =
+  | { type: 'say'; text: TextByPlayer; pitch?: number }
+  | { type: 'wait'; ms: number }
+  | { type: 'view'; view: ViewDef; trot?: boolean }
+  | { type: 'show' | 'hide'; ids: string[] }
+  | { type: 'move'; id: string; x: number; y: number; ms?: number; scale?: number; flip?: boolean }
+  | {
+      type: 'pick';
+      player: StepPlayer;
+      prompt: TextByPlayer;
+      /** Objets acceptés (n'importe lequel convient). */
+      accept: string[];
+      dest?: Dest;
+      success_line?: TextByPlayer;
+      retry_line?: TextByPlayer;
+      /** Bulle d'un personnage montrant l'objet demandé. */
+      bubble?: { x: number; y: number; item: ItemDef };
+    }
+  | {
+      type: 'choose_color';
+      player: StepPlayer;
+      prompt: TextByPlayer;
+      /** Objet à colorier ; {player} est remplacé par l'id du joueur. */
+      target: string;
+      colors: { color: string; line: string }[];
+      y?: number;
+    }
+  | {
+      type: 'fork';
+      player: StepPlayer;
+      prompt: TextByPlayer;
+      options: { id: string; card: DecorDef[]; line: string; view: ViewDef }[];
+    }
+  | {
+      type: 'two_touch';
+      prompt: TextByPlayer;
+      area: { x: number; y: number; w: number; h: number };
+      /** Change la couleur du liquide d'un chaudron. */
+      effect?: { target: string; color: string };
+      success_line?: TextByPlayer;
+    }
+  | { type: 'parts'; parts: Record<PlayerId, StepDef[]> }
+  | { type: 'reward'; from: Point };
+
+export interface PlaceDef {
+  _meta?: { version: string; description: string };
+  id: string;
+  /** Récompense gagnée à la fin (case du sac). */
+  reward: string;
+  view: ViewDef;
+  items: (ItemDef & { id: string; hidden?: boolean })[];
+  steps: StepDef[];
+  hint_delays_s: number[];
+  auto_solve_after_s?: number;
+  lumi: { home: Point };
+  ambient_hotspots?: AmbientDef[];
+  lines: { done: string };
 }

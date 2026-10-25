@@ -1,0 +1,94 @@
+{
+  "_meta": {"version": "0.1", "description": "La boutique de potions"},
+  "id": "potions",
+  "reward": "potion",
+  "hint_delays_s": [8, 15, 25],
+  "auto_solve_after_s": 35,
+  "lumi": {"home": {"x": 470, "y": 150}},
+  "view": {
+    "backdrop": "shop",
+    "decor": [
+      {"type": "shelf", "x": 1020, "y": 300, "width": 930},
+      {"type": "shelf", "x": 1020, "y": 480, "width": 930},
+      {"type": "jars", "x": 1450, "y": 640, "scale": 0.9},
+      {"type": "lantern", "x": 560, "y": 120}
+    ]
+  },
+  "items": [
+    {"id": "apothecary", "kind": "npc", "npc": "apothecary", "x": 210, "y": 880, "scale": 0.95},
+    {"id": "cauldron", "kind": "cauldron", "x": 900, "y": 880, "color": "#66bb6a"},
+    {"id": "feather_blue", "kind": "feather", "color": "#1e88e5", "x": 650, "y": 300, "scale": 0.85, "tap": true},
+    {"id": "mush_red", "kind": "mushroom", "color": "red", "x": 800, "y": 300, "scale": 0.85, "tap": true},
+    {"id": "star_white", "kind": "star", "color": "#eceff1", "x": 950, "y": 300, "scale": 0.85, "tap": true},
+    {"id": "bottle_green", "kind": "bottle", "color": "#66bb6a", "x": 1100, "y": 300, "scale": 0.85, "tap": true},
+    {"id": "leaf_green", "kind": "leaf", "color": "#43a047", "x": 1250, "y": 300, "scale": 0.85, "tap": true},
+    {"id": "crystal_purple", "kind": "crystal", "color": "#ab47bc", "x": 1390, "y": 300, "scale": 0.85, "tap": true},
+    {"id": "star_gold", "kind": "star", "color": "#ffca28", "x": 650, "y": 480, "scale": 0.85, "tap": true},
+    {"id": "feather_red", "kind": "feather", "color": "#e53935", "x": 800, "y": 480, "scale": 0.85, "tap": true},
+    {"id": "mush_blue", "kind": "mushroom", "color": "blue", "x": 950, "y": 480, "scale": 0.85, "tap": true},
+    {"id": "crystal_cyan", "kind": "crystal", "color": "#4dd0e1", "x": 1100, "y": 480, "scale": 0.85, "tap": true},
+    {"id": "feather_yellow", "kind": "feather", "color": "#fdd835", "x": 1250, "y": 480, "scale": 0.85, "tap": true},
+    {"id": "leaf_orange", "kind": "leaf", "color": "#fb8c00", "x": 1390, "y": 480, "scale": 0.85, "tap": true}
+  ],
+  "ambient_hotspots": [
+    {"id": "bat", "x": 240, "y": 160, "reaction": "flap"},
+    {"id": "crystal", "x": 560, "y": 700, "reaction": "shine", "color": "#b388ff", "scale": 0.7}
+  ],
+  "steps": [
+    {
+      "type": "say",
+      "pitch": 0.7,
+      "text": "Bonjour les enfants ! Je prépare une potion magique, mais je ne retrouve plus mes ingrédients. Vous m'aidez ?"
+    },
+    {
+      "type": "pick",
+      "player": "first",
+      "prompt": {
+        "elea": "Elea, l'apothicaire a besoin d'une plume bleue. Trouve-la sur les étagères !",
+        "isao": "Isao, l'apothicaire a besoin d'une plume bleue. Trouve-la sur les étagères !"
+      },
+      "accept": ["feather_blue"],
+      "dest": {"x": 900, "y": 670, "scale": 0.5, "vanish": true},
+      "bubble": {"x": 400, "y": 300, "item": {"kind": "feather", "color": "#1e88e5"}},
+      "success_line": "Plouf ! La plume bleue est dans le chaudron !",
+      "retry_line": "Ce n'est pas ça. Regarde bien la bulle de l'apothicaire !"
+    },
+    {
+      "type": "pick",
+      "player": "second",
+      "prompt": {
+        "elea": "Elea, maintenant il faut un champignon rouge. Trouve-le !",
+        "isao": "Isao, maintenant il faut un champignon rouge. Trouve-le !"
+      },
+      "accept": ["mush_red"],
+      "dest": {"x": 900, "y": 670, "scale": 0.5, "vanish": true},
+      "bubble": {"x": 400, "y": 300, "item": {"kind": "mushroom", "color": "red", "scale": 0.8}},
+      "success_line": "Plouf ! Le champignon rouge est dans le chaudron !",
+      "retry_line": "Ce n'est pas ça. Regarde bien la bulle de l'apothicaire !"
+    },
+    {
+      "type": "pick",
+      "player": "both",
+      "prompt": "Et le dernier : une étoile dorée ! Cherchez-la tous les deux !",
+      "accept": ["star_gold"],
+      "dest": {"x": 900, "y": 670, "scale": 0.5, "vanish": true},
+      "bubble": {"x": 400, "y": 300, "item": {"kind": "star", "color": "#ffca28"}},
+      "success_line": "Plouf ! Tous les ingrédients sont dans le chaudron !",
+      "retry_line": "Ce n'est pas ça. Regarde bien la bulle de l'apothicaire !"
+    },
+    {
+      "type": "two_touch",
+      "prompt": "Maintenant, touchez le chaudron tous les deux pour mélanger !",
+      "area": {"x": 900, "y": 770, "w": 300, "h": 230},
+      "effect": {"target": "cauldron", "color": "#f06292"},
+      "success_line": "Bloup, bloup, bloup ! La potion devient rose. Elle est prête !"
+    },
+    {
+      "type": "say",
+      "pitch": 0.7,
+      "text": "Merci beaucoup ! Voici une potion magique. Gardez-la bien, elle vous servira !"
+    },
+    {"type": "reward", "from": {"x": 900, "y": 560}}
+  ],
+  "lines": {"done": "Touchez la grosse flèche pour retourner au village !"}
+}

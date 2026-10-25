@@ -7,6 +7,8 @@ export interface Prefs {
   voice_rate: number;
   /** Tableau où reprendre (0 = premier ; égal au nombre de scènes = la Porte). */
   board: number;
+  /** Village : maisons terminées et couleur des licornes de chaque enfant. */
+  village: { done: string[]; unicorns: Record<string, string> };
 }
 
 const KEY = 'isao-elea.prefs.v1';
@@ -25,6 +27,7 @@ export function loadPrefs(settings: GameSettings): Prefs {
     voice_volume: settings.voice.volume,
     voice_rate: settings.voice.rate,
     board: 0,
+    village: { done: [], unicorns: {} },
   };
   try {
     const raw = localStorage.getItem(KEY);
@@ -36,6 +39,13 @@ export function loadPrefs(settings: GameSettings): Prefs {
       if (typeof saved.voice_volume === 'number') prefs.voice_volume = saved.voice_volume;
       if (typeof saved.voice_rate === 'number') prefs.voice_rate = saved.voice_rate;
       if (typeof saved.board === 'number' && Number.isInteger(saved.board) && saved.board >= 0) prefs.board = saved.board;
+      const v = saved.village;
+      if (v && typeof v === 'object') {
+        if (Array.isArray(v.done)) prefs.village.done = v.done.filter((x): x is string => typeof x === 'string');
+        if (v.unicorns && typeof v.unicorns === 'object') {
+          for (const [k, c] of Object.entries(v.unicorns)) if (typeof c === 'string') prefs.village.unicorns[k] = c;
+        }
+      }
     }
   } catch {
     // stockage indisponible (navigation privée...) : on garde les valeurs par défaut

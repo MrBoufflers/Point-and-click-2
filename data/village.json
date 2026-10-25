@@ -1,0 +1,87 @@
+{
+  "_meta": {"version": "0.1", "description": "Le village (après la Porte)"},
+  "id": "village_1",
+  "view": {
+    "backdrop": "village",
+    "decor": [
+      {"type": "bush", "x": 80, "y": 140, "scale": 0.8},
+      {"type": "bush", "x": 560, "y": 170, "scale": 0.55},
+      {"type": "bush", "x": 1050, "y": 170, "scale": 0.55},
+      {"type": "bush", "x": 1530, "y": 160, "scale": 0.8},
+      {"type": "flowers", "x": 260, "y": 520},
+      {"type": "flowers", "x": 1340, "y": 520},
+      {"type": "flowers", "x": 640, "y": 470, "scale": 0.8},
+      {"type": "flowers", "x": 960, "y": 470, "scale": 0.8},
+      {"type": "rock", "x": 1000, "y": 880, "color": "#a1887f", "scale": 0.6}
+    ]
+  },
+  "fountain": {"x": 800, "y": 610},
+  "houses": [
+    {
+      "id": "stable",
+      "x": 300,
+      "y": 410,
+      "roof": "#c62828",
+      "wall": "#ffe0b2",
+      "sign": "unicorn",
+      "place": "place_stable.json",
+      "line": "L'écurie des licornes ! On entre !"
+    },
+    {
+      "id": "potions",
+      "x": 800,
+      "y": 400,
+      "roof": "#6a1b9a",
+      "wall": "#e1bee7",
+      "sign": "potion",
+      "place": "place_potions.json",
+      "line": "La boutique de potions ! On entre !"
+    },
+    {
+      "id": "library",
+      "x": 1300,
+      "y": 410,
+      "roof": "#1565c0",
+      "wall": "#fff3e0",
+      "sign": "book",
+      "place": "place_library.json",
+      "line": "La librairie ! On entre !"
+    },
+    {
+      "id": "bakery",
+      "x": 420,
+      "y": 870,
+      "roof": "#ef6c00",
+      "wall": "#fff8e1",
+      "sign": "bread",
+      "scale": 0.85,
+      "line": "C'est la boulangerie. Elle est fermée pour l'instant."
+    },
+    {
+      "id": "forge",
+      "x": 1180,
+      "y": 870,
+      "roof": "#546e7a",
+      "wall": "#eceff1",
+      "sign": "hammer",
+      "scale": 0.85,
+      "line": "C'est la forge. Elle est fermée pour l'instant."
+    }
+  ],
+  "bag": [{"id": "unicorns"}, {"id": "potion"}, {"id": "grimoire"}],
+  "ambient_hotspots": [
+    {"id": "butterfly", "x": 560, "y": 300, "reaction": "flutter", "color": "#ffca28"},
+    {"id": "bird", "x": 1060, "y": 290, "reaction": "fly_away_and_back"},
+    {"id": "flower", "x": 110, "y": 590, "reaction": "bloom", "color": "#ec407a"},
+    {"id": "bush", "x": 1510, "y": 590, "reaction": "shiver", "scale": 0.7},
+    {"id": "snail", "x": 650, "y": 860, "reaction": "hide", "scale": 0.8}
+  ],
+  "hint_delays_s": [10, 20, 30],
+  "lumi": {"home": {"x": 1050, "y": 190}},
+  "lines": {
+    "intro": "Vous avez passé la porte du pays de l'imaginaire ! Voici le village. Les habitants ont besoin de vous.",
+    "prompt": "Touchez une maison pour la visiter !",
+    "closed": "Cette maison est fermée pour l'instant.",
+    "all_done": "Bravo ! Vous avez aidé l'écurie, l'apothicaire et le libraire. Les autres maisons s'ouvriront bientôt !"
+  }
+}

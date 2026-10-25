@@ -1,4 +1,4 @@
-import type { DecorDef, SceneDef } from '../types';
+import type { DecorDef } from '../types';
 import { colorOf, el, place, shade } from './svg';
 import { VIEW_H, VIEW_W, type Layers } from './stage';
 
@@ -11,12 +11,26 @@ interface Colors {
   ground: string;
 }
 
+/** Ce qu'il faut pour dessiner un fond : une scène, ou une « vue » d'un lieu du village. */
+export interface ViewLike {
+  backdrop?: string;
+  background?: Partial<Colors>;
+  decor: DecorDef[];
+}
+
+/** Dessine des éléments de décor dans un groupe (sert aussi aux vignettes des chemins). */
+export function drawDecor(parent: SVGGElement, decor: DecorDef[]): void {
+  for (const d of decor) DECOR[d.type]?.(parent, d);
+}
+
 /** Fond fixe (non interactif) selon `backdrop`, puis le décor de la scène. */
-export function drawBackdrop(layers: Layers, scene: SceneDef): void {
+export function drawBackdrop(layers: Layers, scene: ViewLike): void {
   const kind = scene.backdrop ?? 'forest';
   const base = BACKDROPS[kind] ?? BACKDROPS.forest;
   const colors = { ...base.colors, ...scene.background };
   const bg = layers.bg;
+  bg.textContent = '';
+  layers.decor.textContent = '';
   const sky = el('linearGradient', { id: 'sky', x1: 0, y1: 0, x2: 0, y2: 1 }, bg);
   el('stop', { offset: 0, 'stop-color': colors.sky_top }, sky);
   el('stop', { offset: 1, 'stop-color': colors.sky_bottom }, sky);
@@ -40,7 +54,10 @@ const rays = (bg: SVGGElement, opacity: number) => {
   }
 };
 
-const BACKDROPS: Record<string, { colors: Colors; fireflies?: string; draw: (bg: SVGGElement, c: Colors) => void }> = {
+export type BackdropDef = { colors: Colors; fireflies?: string; draw: (bg: SVGGElement, c: Colors) => void };
+
+/** Fonds disponibles (d'autres fichiers peuvent en ajouter). */
+export const BACKDROPS: Record<string, BackdropDef> = {
   forest: {
     colors: { sky_top: '#123d3a', sky_bottom: '#2f6b4f', ground: '#3b7a3a' },
     fireflies: '#fff59d',
@@ -102,9 +119,10 @@ const BACKDROPS: Record<string, { colors: Colors; fireflies?: string; draw: (bg:
   },
 };
 
-type DecorFn = (parent: SVGGElement, d: DecorDef) => void;
+export type DecorFn = (parent: SVGGElement, d: DecorDef) => void;
 
-const DECOR: Record<string, DecorFn> = {
+/** Éléments de décor disponibles (d'autres fichiers peuvent en ajouter). */
+export const DECOR: Record<string, DecorFn> = {
   tree(parent, d) {
     const g = el('g', {}, parent);
     place(g, d.x, d.y, d.scale ?? 1);
