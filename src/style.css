@@ -321,10 +321,98 @@ button {
   background: #fff;
   animation: twinkle 3s ease-in-out infinite;
 }
+#start .welcome {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 5vw, 56px);
+  width: 100%;
+  max-width: 980px;
+  padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+}
+#start .story {
+  flex: 1 1 auto;
+  max-width: 560px;
+  text-align: center;
+}
+#start h1 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(30px, 8vh, 56px);
+  color: #ffe082;
+  text-shadow: 0 0 18px rgba(255, 213, 79, 0.6), 0 3px 0 #5d4037;
+  letter-spacing: 1px;
+}
+#start h1 span {
+  color: #fff;
+}
+#start .subtitle {
+  margin: 0 0 1.5vh;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(15px, 4vh, 24px);
+  color: #e1bee7;
+  font-style: italic;
+}
+#start .scroll {
+  position: relative;
+  background: linear-gradient(#f6e7c1, #ead39c);
+  color: #4e342e;
+  border-radius: 10px;
+  padding: 1.6vh 22px 1.8vh;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45), inset 0 0 22px rgba(141, 110, 99, 0.35);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(13px, 3.6vh, 18px);
+  line-height: 1.35;
+}
+#start .scroll::before,
+#start .scroll::after {
+  content: '';
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  height: 14px;
+  border-radius: 7px;
+  background: linear-gradient(#c9a66b, #a1784a);
+}
+#start .scroll::before {
+  top: -7px;
+}
+#start .scroll::after {
+  bottom: -7px;
+}
+#start .scroll p {
+  margin: 0;
+}
+#start .scroll-gems {
+  width: min(260px, 70%);
+  height: auto;
+  max-height: 12vh;
+  display: block;
+  margin: 0 auto 0.8vh;
+}
+#start .scroll-gems .door {
+  fill: #8d6e63;
+  stroke: #5d4037;
+  stroke-width: 3;
+}
+#start .go {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#play-label {
+  margin: 12px 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(16px, 4.5vh, 24px);
+  color: #ffe082;
+  text-align: center;
+}
 #play {
   position: relative;
-  width: 168px;
-  height: 168px;
+  width: clamp(120px, 38vh, 168px);
+  height: clamp(120px, 38vh, 168px);
   border: 0;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #fff59d, #ffb300);
@@ -335,8 +423,8 @@ button {
   justify-content: center;
 }
 #play svg {
-  width: 110px;
-  height: 110px;
+  width: 66%;
+  height: 66%;
 }
 #play[disabled] {
   opacity: 0.35;

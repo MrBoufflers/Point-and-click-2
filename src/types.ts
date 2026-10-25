@@ -181,6 +181,8 @@ export interface GameSettings {
   village?: string;
   /** Chapitre 3 : le grand voyage (après les 5 maisons). */
   journey?: string;
+  /** Prologue raconté par Lumi avant le premier tableau. */
+  prologue?: string;
   /** Scène seule (ancien mode, et ?scene=...). */
   scene?: string;
   first_player: PlayerId;

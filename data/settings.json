@@ -3,6 +3,7 @@
   "level": "level_1.json",
   "village": "village.json",
   "journey": "journey.json",
+  "prologue": "prologue.json",
   "first_player": "elea",
   "players": [
     { "id": "elea", "name": "Elea", "initial": "E", "color": "#ec407a", "side": "left" },

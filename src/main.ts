@@ -4,6 +4,7 @@ import { VillageHub } from './engine/places/hub';
 import { buildPlace } from './engine/places/generators';
 import { PlaceRunner } from './engine/places/placeRunner';
 import type { RewardLook } from './render/bag';
+import { drawGemShape } from './render/gems';
 import { SceneRunner } from './engine/sceneRunner';
 import { Sfx } from './engine/sfx';
 import { Voice } from './engine/voice';
@@ -28,6 +29,7 @@ document.addEventListener('touchmove', (e) => {
 
 drawStars();
 drawGearTeeth();
+drawWelcomeGems();
 
 boot().catch((err: unknown) => {
   console.error(err);
@@ -45,6 +47,7 @@ interface Game {
   village: VillageDef | null;
   places: Map<string, PlaceDef>;
   journey: JourneyDef | null;
+  prologue: PlaceDef | null;
 }
 
 async function loadGame(settings: GameSettings): Promise<Game> {
@@ -68,7 +71,8 @@ async function loadGame(settings: GameSettings): Promise<Game> {
     const defs = await Promise.all(journey.steps.map((f) => loadJSON<PlaceDef>(`./data/${f}`)));
     journey.steps.forEach((f, i) => places.set(f, defs[i]));
   }
-  return { scenes, level: isFile(single) ? null : level, village, places, journey };
+  const prologue = !isFile(single) && settings.prologue ? await loadJSON<PlaceDef>(`./data/${settings.prologue}`) : null;
+  return { scenes, level: isFile(single) ? null : level, village, places, journey, prologue };
 }
 
 async function boot(): Promise<void> {
@@ -148,6 +152,24 @@ async function boot(): Promise<void> {
       onJourneyCall: () => {
         // Pilou a parlé : la grosse flèche emmène en voyage.
         onNext = () => startJourney(prefs.journey.step);
+        next.hidden = false;
+      },
+    });
+    runner.start();
+  };
+
+  /** Prologue : Lumi raconte la légende du parchemin, puis la flèche lance le premier tableau. */
+  const startPrologue = () => {
+    if (!game.prologue) return startBoard(0);
+    resetScreen();
+    current = 0;
+    save(0);
+    runner = new PlaceRunner({
+      ...villageCommon(), bagIds: [], rewards: [], place: game.prologue,
+      onState: (s) => {
+        if (s !== 'end') return;
+        ear.hidden = true;
+        onNext = () => startBoard(0);
         next.hidden = false;
       },
     });
@@ -274,13 +296,19 @@ async function boot(): Promise<void> {
   // ---- Écran de démarrage ----
   const play = $<HTMLButtonElement>('play');
   play.disabled = false;
+  // Une partie en cours ? Le bouton propose de la continuer.
+  const resume = prefs.board > 0;
+  $('play-label').textContent = resume ? "Continuer l'aventure" : "Démarrer l'aventure";
+  play.setAttribute('aria-label', $('play-label').textContent ?? '');
   play.addEventListener('click', () => {
     // Tout dans le même gestionnaire : condition d'iOS Safari pour le son et la voix.
     sfx.unlock();
     voice.unlock();
     requestFullscreen();
     $('start').hidden = true;
-    startBoard(prefs.board); // dit la première phrase immédiatement
+    // dit la première phrase immédiatement
+    if (prefs.board === 0 && game.prologue) startPrologue();
+    else startBoard(prefs.board);
   });
 
   restart.addEventListener('click', () => {
@@ -316,7 +344,7 @@ async function boot(): Promise<void> {
       prefs.village = { done: [], unicorns: {}, memory: {} };
       prefs.journey = { step: 0, done: false };
       villageVisited = false;
-      startBoard(0);
+      startPrologue();
     },
   });
 }
@@ -457,6 +485,20 @@ function drawStars(): void {
     s.style.width = s.style.height = `${size}px`;
     box.append(s);
   }
+}
+
+/** Les 5 gemmes du parchemin de l'écran d'accueil, de part et d'autre de la porte. */
+function drawWelcomeGems(): void {
+  const g = document.getElementById('welcome-gems') as SVGGElement | null;
+  if (!g) return;
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue'];
+  const xs = [30, 72, 150, 228, 270];
+  colors.forEach((c, i) => {
+    const gem = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gem.setAttribute("transform", `translate(${xs[i]} ${[44, 30, 9, 30, 44][i]}) scale(${i === 2 ? 8 : 14})`);
+    drawGemShape(gem, c);
+    g.append(gem);
+  });
 }
 
 function drawGearTeeth(): void {

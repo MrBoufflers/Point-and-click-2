@@ -15,6 +15,7 @@ export class Bag {
   private slots = new Map<string, { pos: Point; g: SVGGElement; filled: boolean }>();
 
   constructor(parent: SVGGElement, ids: string[], private look: RewardLook = {}) {
+    if (ids.length === 0) return; // pas de sac (ex. le prologue)
     const n = ids.length;
     const width = n * (SLOT + 20) + 120;
     const cx = 800;

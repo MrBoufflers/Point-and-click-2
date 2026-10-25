@@ -4,6 +4,7 @@
  */
 import type { DecorDef, ItemDef } from '../types';
 import { BACKDROPS, DECOR } from './backdrop';
+import { drawGemShape } from './gems';
 import { DRAWERS } from './items';
 import { colorOf, el, place, shade } from './svg';
 import { VIEW_W } from './stage';
@@ -170,3 +171,29 @@ Object.assign(DRAWERS, {
     return { w: 170, h: 170 };
   },
 });
+
+// ---------------- Prologue : le vieux parchemin ----------------
+
+Object.assign(DRAWERS, {
+  parchment(body: SVGGElement) {
+    el('rect', { x: -470, y: -560, width: 940, height: 540, rx: 16, fill: '#f3e2b8', stroke: '#b08d57', 'stroke-width': 6 }, body);
+    el('rect', { x: -440, y: -530, width: 880, height: 480, rx: 10, fill: 'none', stroke: '#c9a66b', 'stroke-width': 3, 'stroke-dasharray': '14 10' }, body);
+    for (const y of [-575, -25]) {
+      el('rect', { x: -500, y: y - 18, width: 1000, height: 36, rx: 18, fill: '#c9a66b', stroke: '#8d6e63', 'stroke-width': 5 }, body);
+      for (const x of [-500, 500]) el('circle', { cx: x, cy: y, r: 22, fill: '#a1784a', stroke: '#6d4c41', 'stroke-width': 5 }, body);
+    }
+    return { w: 1000, h: 600 };
+  },
+  gem(body: SVGGElement, d: ItemDef) {
+    const g = el('g', { transform: 'translate(0 -60) scale(55)' }, body);
+    drawGemShape(g, d.color ?? 'red');
+    return { w: 110, h: 120 };
+  },
+  door_icon(body: SVGGElement) {
+    el('path', { d: 'M-90 0 V -150 A 90 90 0 0 1 90 -150 V 0 Z', fill: '#8d6e63', stroke: '#4e342e', 'stroke-width': 8 }, body);
+    el('path', { d: 'M-60 0 V -140 A 60 60 0 0 1 60 -140 V 0 Z', fill: '#ffe082', class: 'door-glow' }, body);
+    el('line', { x1: 0, y1: -200, x2: 0, y2: 0, stroke: '#4e342e', 'stroke-width': 6 }, body);
+    return { w: 180, h: 240 };
+  },
+});
+

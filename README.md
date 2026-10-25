@@ -4,6 +4,12 @@ Jeu point-and-click pour deux enfants non-lecteurs qui jouent ensemble sur un se
 
 **En ligne : https://mrboufflers.github.io/Point-and-click-2/** (mis à jour automatiquement à chaque push sur `main`).
 
+## Accueil et prologue
+
+L'écran d'accueil montre le titre, un parchemin avec les 5 gemmes et la légende (pour les parents), et un gros bouton
+« Démarrer l'aventure » (ou « Continuer l'aventure » si une partie est en cours). Une nouvelle partie commence par un court
+prologue raconté par Lumi (`data/prologue.json`) : le vieux parchemin, les 5 gemmes qui apparaissent, la porte du pays de l'imaginaire.
+
 ## Niveau 1
 
 | # | Tableau | Notion | Tour 1 | Tour 2 |

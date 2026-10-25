@@ -48,9 +48,26 @@
 
     <div id="start">
       <div id="stars"></div>
-      <button id="play" type="button" aria-label="Jouer" disabled>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="36,24 80,50 36,76" fill="#5d4037" stroke="#5d4037" stroke-width="8" stroke-linejoin="round" /></svg>
-      </button>
+      <div class="welcome">
+        <div class="story">
+          <h1>Isao <span>&amp;</span> Elea</h1>
+          <p class="subtitle">La Porte des 5 gemmes</p>
+          <div class="scroll">
+            <svg class="scroll-gems" viewBox="0 0 300 70" aria-hidden="true">
+              <path class="door" d="M134 68 V 42 A 16 16 0 0 1 166 42 V 68 Z" />
+              <g id="welcome-gems"></g>
+            </svg>
+            <p>Il paraît, selon un vieux parchemin, qu'en trouvant les <b>5 gemmes magiques</b> on peut ouvrir la porte
+              du <b>pays de l'imaginaire</b>… et y vivre une aventure incroyable&nbsp;!</p>
+          </div>
+        </div>
+        <div class="go">
+          <button id="play" type="button" aria-label="Démarrer l'aventure" disabled>
+            <svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="36,24 80,50 36,76" fill="#5d4037" stroke="#5d4037" stroke-width="8" stroke-linejoin="round" /></svg>
+          </button>
+          <p id="play-label">Démarrer l'aventure</p>
+        </div>
+      </div>
       <p id="load-error" hidden></p>
     </div>
 

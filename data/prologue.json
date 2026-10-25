@@ -1,0 +1,52 @@
+{
+  "_meta": {"version": "0.1", "description": "Prologue : la légende du vieux parchemin"},
+  "id": "prologue",
+  "reward": "",
+  "hint_delays_s": [10, 20, 30],
+  "lumi": {"home": {"x": 1380, "y": 260}},
+  "view": {
+    "backdrop": "library",
+    "decor": [
+      {"type": "bookcase", "x": 800, "y": 600, "width": 1300, "height": 480, "shelves": 3},
+      {"type": "lantern", "x": 160, "y": 120},
+      {"type": "lantern", "x": 1440, "y": 120}
+    ]
+  },
+  "items": [
+    {"id": "parchment", "kind": "parchment", "x": 800, "y": 800, "scale": 0.9, "hidden": true},
+    {"id": "door", "kind": "door_icon", "x": 800, "y": 700, "scale": 0.9, "hidden": true},
+    {"id": "gem_red", "kind": "gem", "color": "red", "x": 540, "y": 470, "scale": 0.9, "hidden": true},
+    {"id": "gem_orange", "kind": "gem", "color": "orange", "x": 660, "y": 420, "scale": 0.9, "hidden": true},
+    {"id": "gem_yellow", "kind": "gem", "color": "yellow", "x": 800, "y": 395, "scale": 0.9, "hidden": true},
+    {"id": "gem_green", "kind": "gem", "color": "green", "x": 940, "y": 420, "scale": 0.9, "hidden": true},
+    {"id": "gem_blue", "kind": "gem", "color": "blue", "x": 1060, "y": 470, "scale": 0.9, "hidden": true}
+  ],
+  "steps": [
+    {"type": "say", "text": "Il était une fois, dans une très vieille bibliothèque, un parchemin tout poussiéreux…"},
+    {"type": "show", "ids": ["parchment"]},
+    {
+      "type": "say",
+      "text": "Il raconte une légende. Quelque part, dans la forêt, la rivière, la grotte, la prairie et la montagne, se cachent cinq gemmes magiques."
+    },
+    {"type": "show", "ids": ["gem_red"]},
+    {"type": "say", "text": "Une rouge,"},
+    {"type": "show", "ids": ["gem_orange"]},
+    {"type": "say", "text": "une orange,"},
+    {"type": "show", "ids": ["gem_yellow"]},
+    {"type": "say", "text": "une jaune,"},
+    {"type": "show", "ids": ["gem_green"]},
+    {"type": "say", "text": "une verte,"},
+    {"type": "show", "ids": ["gem_blue"]},
+    {"type": "say", "text": "et une bleue !"},
+    {"type": "show", "ids": ["door"]},
+    {
+      "type": "say",
+      "text": "Celui qui trouve les cinq gemmes peut ouvrir la porte du pays de l'imaginaire… et y vivre une aventure incroyable !"
+    },
+    {
+      "type": "say",
+      "text": "Isao, Elea, je suis Lumi, votre amie la petite lumière. On part ensemble à la recherche des gemmes ?"
+    }
+  ],
+  "lines": {"done": "Alors en route ! Touchez la grosse flèche pour commencer l'aventure !"}
+}
