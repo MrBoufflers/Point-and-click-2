@@ -349,6 +349,50 @@ async function boot(): Promise<void> {
   });
 }
 
+// ---------------- Plein écran ----------------
+
+type FsDoc = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void; webkitFullscreenEnabled?: boolean };
+const fsDoc = document as FsDoc;
+const isFullscreen = () => !!(fsDoc.fullscreenElement || fsDoc.webkitFullscreenElement);
+/** Ouvert depuis l'écran d'accueil (déjà sans barre) ? */
+const isStandalone = () =>
+  (navigator as Navigator & { standalone?: boolean }).standalone === true ||
+  // (le plein écran demandé par le bouton compte aussi comme « fullscreen » : on l'exclut)
+  (!isFullscreen() && (window.matchMedia?.('(display-mode: fullscreen)').matches || window.matchMedia?.('(display-mode: standalone)').matches));
+/** L'iPhone ne sait pas mettre une page en plein écran : on explique l'écran d'accueil à la place. */
+const canFullscreen = () => {
+  const de = document.documentElement as HTMLElement & { webkitRequestFullscreen?: unknown };
+  return !!(de.requestFullscreen || de.webkitRequestFullscreen) && fsDoc.fullscreenEnabled !== false && fsDoc.webkitFullscreenEnabled !== false;
+};
+
+function setupFullscreenButtons(): void {
+  const buttons = [$('fs-start'), $('fs-game')];
+  const help = $('fs-help');
+  const refresh = () => {
+    document.body.classList.toggle('is-fullscreen', isFullscreen());
+    buttons.forEach((b) => (b.hidden = isStandalone()));
+  };
+  const toggle = (e: Event) => {
+    e.stopPropagation();
+    if (isFullscreen()) {
+      try {
+        void (fsDoc.exitFullscreen ? fsDoc.exitFullscreen() : fsDoc.webkitExitFullscreen?.());
+      } catch {
+        /* rien */
+      }
+    } else if (canFullscreen()) {
+      requestFullscreen();
+    } else {
+      help.hidden = false;
+    }
+  };
+  buttons.forEach((b) => b.addEventListener('click', toggle));
+  $('fs-help-close').addEventListener('click', () => (help.hidden = true));
+  document.addEventListener('fullscreenchange', refresh);
+  document.addEventListener('webkitfullscreenchange', refresh);
+  refresh();
+}
+
 function requestFullscreen(): void {
   const de = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void };
   try {
@@ -515,3 +559,6 @@ function drawGearTeeth(): void {
     g.append(r);
   }
 }
+
+// Après les définitions ci-dessus (constantes du plein écran).
+setupFullscreenButtons();

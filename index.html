@@ -6,6 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#0b1026" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
     <title>Isao &amp; Elea — la Porte des 5 gemmes</title>
   </head>
   <body>
@@ -20,6 +23,12 @@
             <circle r="11" />
             <circle r="4.5" class="hole" />
           </g>
+        </svg>
+      </button>
+      <button id="fs-game" class="fs-btn" type="button" aria-label="Plein écran">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+          <g class="fs-enter"><path d="M10 20 V 10 H 20 M32 10 H 42 V 20 M42 32 V 42 H 32 M20 42 H 10 V 32" /></g>
+          <g class="fs-exit"><path d="M20 10 V 20 H 10 M42 20 H 32 V 10 M32 42 V 32 H 42 M10 32 H 20 V 42" /></g>
         </svg>
       </button>
       <button id="ear" type="button" aria-label="Répéter la consigne">
@@ -48,6 +57,13 @@
 
     <div id="start">
       <div id="stars"></div>
+      <button id="fs-start" class="fs-btn" type="button" aria-label="Plein écran">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+          <g class="fs-enter"><path d="M10 20 V 10 H 20 M32 10 H 42 V 20 M42 32 V 42 H 32 M20 42 H 10 V 32" /></g>
+          <g class="fs-exit"><path d="M20 10 V 20 H 10 M42 20 H 32 V 10 M32 42 V 32 H 42 M10 32 H 20 V 42" /></g>
+        </svg>
+        <span>Plein écran</span>
+      </button>
       <div class="welcome">
         <div class="story">
           <h1>Isao <span>&amp;</span> Elea</h1>
@@ -69,6 +85,19 @@
         </div>
       </div>
       <p id="load-error" hidden></p>
+    </div>
+
+    <div id="fs-help" hidden>
+      <div class="card" role="dialog" aria-label="Plein écran sur iPhone">
+        <h2>Plein écran sur iPhone</h2>
+        <p>Safari ne permet pas le plein écran pour une page web. Pour jouer sans barre :</p>
+        <ol>
+          <li>Touchez le bouton <b>Partager</b> (le carré avec une flèche vers le haut).</li>
+          <li>Choisissez <b>« Sur l'écran d'accueil »</b>.</li>
+          <li>Ouvrez le jeu depuis la nouvelle icône : il s'affiche en plein écran.</li>
+        </ol>
+        <div class="row"><button id="fs-help-close" type="button" class="primary">Compris</button></div>
+      </div>
     </div>
 
     <div id="panel" hidden>

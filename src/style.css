@@ -244,6 +244,91 @@ button {
 #ear .wave {
   stroke: #ef6c00;
 }
+/* Bouton plein écran */
+.fs-btn {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #fff;
+}
+.fs-btn svg path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.fs-btn .fs-exit,
+body.is-fullscreen .fs-btn .fs-enter {
+  display: none;
+}
+body.is-fullscreen .fs-btn .fs-exit {
+  display: inline;
+}
+#fs-game {
+  top: max(6px, env(safe-area-inset-top));
+  left: calc(max(6px, env(safe-area-inset-left)) + 62px);
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25) !important;
+  opacity: 0.6;
+}
+#fs-start {
+  position: absolute;
+  z-index: 2;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 6px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 15px;
+  cursor: pointer;
+}
+#fs-start svg {
+  width: 36px;
+  height: 36px;
+}
+#fs-help {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+#fs-help .card {
+  background: #fffdf7;
+  color: #263238;
+  border-radius: 16px;
+  padding: 12px 18px 14px;
+  width: min(520px, 94vw);
+  max-height: 94vh;
+  overflow: auto;
+  font-size: 15px;
+}
+#fs-help h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+#fs-help ol {
+  margin: 6px 0;
+  padding-left: 22px;
+}
+#fs-help .row button {
+  min-height: 44px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #ffb300;
+  background: #ffca28;
+  color: #263238;
+  font: inherit;
+}
+
 #gear {
   top: max(6px, env(safe-area-inset-top));
   left: max(6px, env(safe-area-inset-left));

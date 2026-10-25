@@ -1,0 +1,11 @@
+{
+  "name": "Isao & Elea — la Porte des 5 gemmes",
+  "short_name": "Isao & Elea",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0b1026",
+  "theme_color": "#0b1026",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
